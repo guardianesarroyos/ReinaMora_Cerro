@@ -99,25 +99,74 @@
             color: var(--secondary-color);
         }
 
-        .wind-direction {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background: var(--wind-color);
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            color: white;
-            margin-left: 5px;
-            font-size: 12px;
+        .wind-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .wind-info {
+        /* Estilos para la rosa de los vientos */
+        .wind-rose-container {
+            margin-top: 10px;
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 5px auto;
+        }
+
+        .wind-rose {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .wind-rose-pointer {
+            position: absolute;
+            width: 0;
+            height: 0;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 15px solid var(--wind-color);
+            transform-origin: 50% 40px;
+            transition: transform 0.5s ease;
+            z-index: 2;
+        }
+
+        .wind-direction-letter {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--card-color);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: bold;
+            color: var(--wind-color);
+            z-index: 3;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
         }
 
+        .wind-rose-cardinal {
+            position: absolute;
+            font-size: 10px;
+            color: var(--secondary-color);
+        }
+
+        .wind-rose-cardinal.n { top: 2px; left: 50%; transform: translateX(-50%); }
+        .wind-rose-cardinal.e { top: 50%; right: 2px; transform: translateY(-50%); }
+        .wind-rose-cardinal.s { bottom: 2px; left: 50%; transform: translateX(-50%); }
+        .wind-rose-cardinal.w { top: 50%; left: 2px; transform: translateY(-50%); }
+
+        /* Estilos para el pronóstico horario */
         .forecast-container {
             margin-top: 20px;
         }
@@ -200,10 +249,18 @@
             <div class="detail-item">
                 <div>Viento</div>
                 <div class="wind-info">
-                    <span id="wind">--</span><span class="units"> km/h</span>
-                    <div id="wind-direction-icon" class="wind-direction" title="Dirección del viento">?</div>
+                    <span id="wind">--<span class="units"> km/h</span></span>
+                    <div class="wind-rose-container">
+                        <div class="wind-rose">
+                            <div class="wind-rose-pointer" id="wind-pointer"></div>
+                            <div class="wind-direction-letter" id="wind-direction-letter">O</div>
+                            <div class="wind-rose-cardinal n">N</div>
+                            <div class="wind-rose-cardinal e">E</div>
+                            <div class="wind-rose-cardinal s">S</div>
+                            <div class="wind-rose-cardinal w">O</div>
+                        </div>
+                    </div>
                 </div>
-                <div id="wind-direction-text" style="font-size:12px;margin-top:5px;">--</div>
             </div>
             <div class="detail-item">
                 <div>Precipitación</div>
@@ -244,10 +301,7 @@
                     
                     // Dirección del viento
                     if(data.current.wind_direction_10m) {
-                        const windDirection = getWindDirection(data.current.wind_direction_10m);
-                        document.getElementById('wind-direction-icon').textContent = windDirection.arrow;
-                        document.getElementById('wind-direction-icon').style.transform = `rotate(${data.current.wind_direction_10m}deg)`;
-                        document.getElementById('wind-direction-text').textContent = `${windDirection.cardinal} (${data.current.wind_direction_10m}°)`;
+                        updateWindDirection(data.current.wind_direction_10m);
                     }
                     
                     // Descripción del clima basada en weather_code
@@ -271,6 +325,27 @@
                 console.error('Error al obtener datos meteorológicos:', error);
                 document.getElementById('weather-description').textContent = "Error al cargar datos meteorológicos";
             }
+        }
+        
+        // Actualizar la dirección del viento con rosa de los vientos
+        function updateWindDirection(degrees) {
+            const directions = [
+                { min: 0, max: 22.5, cardinal: "N", letter: "N" },
+                { min: 22.5, max: 67.5, cardinal: "NE", letter: "NE" },
+                { min: 67.5, max: 112.5, cardinal: "E", letter: "E" },
+                { min: 112.5, max: 157.5, cardinal: "SE", letter: "SE" },
+                { min: 157.5, max: 202.5, cardinal: "S", letter: "S" },
+                { min: 202.5, max: 247.5, cardinal: "SO", letter: "SO" },
+                { min: 247.5, max: 292.5, cardinal: "O", letter: "O" },
+                { min: 292.5, max: 337.5, cardinal: "NO", letter: "NO" },
+                { min: 337.5, max: 360, cardinal: "N", letter: "N" }
+            ];
+            
+            const direction = directions.find(d => degrees >= d.min && degrees < d.max) || { cardinal: "N", letter: "N" };
+            
+            // Actualizar la rosa de los vientos
+            document.getElementById('wind-pointer').style.transform = `translateX(-50%) rotate(${degrees}deg)`;
+            document.getElementById('wind-direction-letter').textContent = direction.letter;
         }
         
         // Actualizar el pronóstico por horas
@@ -301,24 +376,6 @@
                 
                 hourlyContainer.appendChild(hourItem);
             }
-        }
-        
-        // Convertir grados de dirección del viento a punto cardinal
-        function getWindDirection(degrees) {
-            const directions = [
-                { min: 0, max: 22.5, cardinal: "Norte", arrow: "↑" },
-                { min: 22.5, max: 67.5, cardinal: "Noreste", arrow: "↗" },
-                { min: 67.5, max: 112.5, cardinal: "Este", arrow: "→" },
-                { min: 112.5, max: 157.5, cardinal: "Sureste", arrow: "↘" },
-                { min: 157.5, max: 202.5, cardinal: "Sur", arrow: "↓" },
-                { min: 202.5, max: 247.5, cardinal: "Suroeste", arrow: "↙" },
-                { min: 247.5, max: 292.5, cardinal: "Oeste", arrow: "←" },
-                { min: 292.5, max: 337.5, cardinal: "Noroeste", arrow: "↖" },
-                { min: 337.5, max: 360, cardinal: "Norte", arrow: "↑" }
-            ];
-            
-            const direction = directions.find(d => degrees >= d.min && degrees < d.max);
-            return direction || { cardinal: "Desconocido", arrow: "?" };
         }
         
         // Mapeo de códigos de clima a descripciones
