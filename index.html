@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clima en Del Quisco</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --card-color: white;
+            --text-color: #333;
+            --primary-color: #2c3e50;
+            --secondary-color: #7f8c8d;
+            --accent-color: #e74c3c;
+            --wind-color: #3498db;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --card-color: #1e1e1e;
+                --text-color: #f0f0f0;
+                --primary-color: #4a89dc;
+                --secondary-color: #a0a0a0;
+                --accent-color: #e74c3c;
+                --wind-color: #5dade2;
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .weather-card {
+            background-color: var(--card-color);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .location {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .temperature {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .weather-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+        }
+
+        .details {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .detail-item {
+            margin: 5px;
+            min-width: 100px;
+            padding: 10px;
+            background-color: rgba(0,0,0,0.05);
+            border-radius: 10px;
+            flex-grow: 1;
+        }
+
+        .updated {
+            font-size: 12px;
+            color: var(--secondary-color);
+            margin-top: 20px;
+        }
+
+        .altitude-adjustment {
+            font-size: 14px;
+            color: var(--accent-color);
+            margin-top: 5px;
+        }
+
+        .units {
+            font-size: 14px;
+            color: var(--secondary-color);
+        }
+
+        .wind-direction {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: var(--wind-color);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            color: white;
+            margin-left: 5px;
+            font-size: 12px;
+        }
+
+        .wind-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .forecast-container {
+            margin-top: 20px;
+        }
+
+        .forecast-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .hourly-forecast {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 5px;
+            scrollbar-width: thin;
+        }
+
+        .hour-item {
+            min-width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(0,0,0,0.05);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .hour-time {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .hour-temp {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        .hour-icon {
+            font-size: 24px;
+            margin: 5px 0;
+        }
+
+        @media (max-width: 480px) {
+            .weather-card {
+                padding: 15px;
+            }
+            
+            .detail-item {
+                min-width: 80px;
+                padding: 8px;
+            }
+            
+            .hour-item {
+                min-width: 70px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-card">
+        <div class="location">Del Quisco, Río Negro</div>
+        <div>Altitud: 1000 msnm</div>
+        
+        <div id="weather-icon" class="weather-icon"></div>
+        
+        <div class="temperature" id="temperature">--°C</div>
+        <div class="altitude-adjustment">(Ajustado por altitud: 1.5°C menos que aeropuerto)</div>
+        
+        <div id="weather-description">Cargando datos...</div>
+        
+        <div class="details">
+            <div class="detail-item">
+                <div>Humedad</div>
+                <div id="humidity">--<span class="units"> %</span></div>
+            </div>
+            <div class="detail-item">
+                <div>Viento</div>
+                <div class="wind-info">
+                    <span id="wind">--</span><span class="units"> km/h</span>
+                    <div id="wind-direction-icon" class="wind-direction" title="Dirección del viento">?</div>
+                </div>
+                <div id="wind-direction-text" style="font-size:12px;margin-top:5px;">--</div>
+            </div>
+            <div class="detail-item">
+                <div>Precipitación</div>
+                <div id="precipitation">--<span class="units"> mm</span></div>
+            </div>
+        </div>
+        
+        <div class="forecast-container">
+            <div class="forecast-title">Próximas 6 horas:</div>
+            <div id="hourly-forecast" class="hourly-forecast">
+                <!-- Pronóstico por horas se cargará aquí -->
+            </div>
+        </div>
+        
+        <div class="updated" id="updated">Actualizando datos...</div>
+    </div>
+
+    <script>
+        // Coordenadas de tu casa
+        const latitude = -41.185470;
+        const longitude = -71.371370;
+        
+        // Función para obtener datos meteorológicos
+        async function fetchWeatherData() {
+            try {
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m&hourly=temperature_2m,weather_code,precipitation_probability&timezone=auto&forecast_days=1`);
+                const data = await response.json();
+                
+                if(data.current) {
+                    // Ajustar temperatura por altitud (1.5° menos que el aeropuerto)
+                    const adjustedTemp = (data.current.temperature_2m - 1.5).toFixed(1);
+                    
+                    // Actualizar la interfaz
+                    document.getElementById('temperature').textContent = `${adjustedTemp}°C`;
+                    document.getElementById('humidity').textContent = `${data.current.relative_humidity_2m}%`;
+                    document.getElementById('wind').textContent = `${Math.round(data.current.wind_speed_10m)}`;
+                    document.getElementById('precipitation').textContent = `${data.current.precipitation}`;
+                    
+                    // Dirección del viento
+                    if(data.current.wind_direction_10m) {
+                        const windDirection = getWindDirection(data.current.wind_direction_10m);
+                        document.getElementById('wind-direction-icon').textContent = windDirection.arrow;
+                        document.getElementById('wind-direction-icon').style.transform = `rotate(${data.current.wind_direction_10m}deg)`;
+                        document.getElementById('wind-direction-text').textContent = `${windDirection.cardinal} (${data.current.wind_direction_10m}°)`;
+                    }
+                    
+                    // Descripción del clima basada en weather_code
+                    const weatherDescription = getWeatherDescription(data.current.weather_code);
+                    document.getElementById('weather-description').textContent = weatherDescription;
+                    
+                    // Icono del clima
+                    const weatherIcon = getWeatherIcon(data.current.weather_code);
+                    document.getElementById('weather-icon').innerHTML = weatherIcon;
+                    
+                    // Pronóstico por horas
+                    if(data.hourly && data.hourly.time && data.hourly.time.length > 0) {
+                        updateHourlyForecast(data);
+                    }
+                    
+                    // Fecha de actualización
+                    const now = new Date();
+                    document.getElementById('updated').textContent = `Última actualización: ${now.toLocaleTimeString()}`;
+                }
+            } catch (error) {
+                console.error('Error al obtener datos meteorológicos:', error);
+                document.getElementById('weather-description').textContent = "Error al cargar datos meteorológicos";
+            }
+        }
+        
+        // Actualizar el pronóstico por horas
+        function updateHourlyForecast(data) {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const hourlyContainer = document.getElementById('hourly-forecast');
+            hourlyContainer.innerHTML = '';
+            
+            // Obtener las próximas 6 horas (incluyendo la actual si está disponible)
+            for (let i = 0; i < 6; i++) {
+                const hourIndex = currentHour + i;
+                if (hourIndex >= data.hourly.time.length) break;
+                
+                const hourTime = new Date(data.hourly.time[hourIndex]);
+                const hourTemp = (data.hourly.temperature_2m[hourIndex] - 1.5).toFixed(1); // Ajuste por altitud
+                const hourCode = data.hourly.weather_code[hourIndex];
+                const hourPrecip = data.hourly.precipitation_probability[hourIndex];
+                
+                const hourItem = document.createElement('div');
+                hourItem.className = 'hour-item';
+                hourItem.innerHTML = `
+                    <div class="hour-time">${hourTime.getHours()}:00</div>
+                    <div class="hour-icon">${getWeatherIcon(hourCode, true)}</div>
+                    <div class="hour-temp">${hourTemp}°C</div>
+                    <div style="font-size:12px;">${hourPrecip}% 💧</div>
+                `;
+                
+                hourlyContainer.appendChild(hourItem);
+            }
+        }
+        
+        // Convertir grados de dirección del viento a punto cardinal
+        function getWindDirection(degrees) {
+            const directions = [
+                { min: 0, max: 22.5, cardinal: "Norte", arrow: "↑" },
+                { min: 22.5, max: 67.5, cardinal: "Noreste", arrow: "↗" },
+                { min: 67.5, max: 112.5, cardinal: "Este", arrow: "→" },
+                { min: 112.5, max: 157.5, cardinal: "Sureste", arrow: "↘" },
+                { min: 157.5, max: 202.5, cardinal: "Sur", arrow: "↓" },
+                { min: 202.5, max: 247.5, cardinal: "Suroeste", arrow: "↙" },
+                { min: 247.5, max: 292.5, cardinal: "Oeste", arrow: "←" },
+                { min: 292.5, max: 337.5, cardinal: "Noroeste", arrow: "↖" },
+                { min: 337.5, max: 360, cardinal: "Norte", arrow: "↑" }
+            ];
+            
+            const direction = directions.find(d => degrees >= d.min && degrees < d.max);
+            return direction || { cardinal: "Desconocido", arrow: "?" };
+        }
+        
+        // Mapeo de códigos de clima a descripciones
+        function getWeatherDescription(weatherCode) {
+            const codes = {
+                0: "Despejado",
+                1: "Mayormente despejado",
+                2: "Parcialmente nublado",
+                3: "Nublado",
+                45: "Niebla",
+                48: "Niebla helada",
+                51: "Llovizna ligera",
+                53: "Llovizna moderada",
+                55: "Llovizna densa",
+                56: "Llovizna helada ligera",
+                57: "Llovizna helada densa",
+                61: "Lluvia ligera",
+                63: "Lluvia moderada",
+                65: "Lluvia intensa",
+                66: "Lluvia helada ligera",
+                67: "Lluvia helada intensa",
+                71: "Nieve ligera",
+                73: "Nieve moderada",
+                75: "Nieve intensa",
+                77: "Granizo",
+                80: "Chubascos ligeros",
+                81: "Chubascos moderados",
+                82: "Chubascos violentos",
+                85: "Nevadas ligeras",
+                86: "Nevadas intensas",
+                95: "Tormenta eléctrica",
+                96: "Tormenta eléctrica con granizo ligero",
+                99: "Tormenta eléctrica con granizo intenso"
+            };
+            
+            return codes[weatherCode] || "Condiciones desconocidas";
+        }
+        
+        // Mapeo de códigos de clima a iconos
+        function getWeatherIcon(weatherCode, small = false) {
+            const icons = {
+                0: "☀️",  // Despejado
+                1: "🌤",  // Mayormente despejado
+                2: "⛅",  // Parcialmente nublado
+                3: "☁️",  // Nublado
+                45: "🌫", // Niebla
+                48: "🌫", // Niebla helada
+                51: "🌦", // Llovizna ligera
+                53: "🌧", // Llovizna moderada
+                55: "🌧", // Llovizna densa
+                61: "🌧", // Lluvia ligera
+                63: "🌧", // Lluvia moderada
+                65: "🌧", // Lluvia intensa
+                71: "❄️", // Nieve ligera
+                73: "❄️", // Nieve moderada
+                75: "❄️", // Nieve intensa
+                77: "🌨", // Granizo
+                80: "🌧", // Chubascos ligeros
+                81: "🌧", // Chubascos moderados
+                82: "🌧", // Chubascos violentos
+                85: "🌨", // Nevadas ligeras
+                86: "🌨", // Nevadas intensas
+                95: "⛈",  // Tormenta eléctrica
+                96: "⛈",  // Tormenta con granizo ligero
+                99: "⛈"   // Tormenta con granizo intenso
+            };
+            
+            const size = small ? "24px" : "80px";
+            return `<div style="font-size: ${size};">${icons[weatherCode] || "❓"}</div>`;
+        }
+        
+        // Cargar datos al inicio y luego cada 5 minutos
+        fetchWeatherData();
+        setInterval(fetchWeatherData, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
