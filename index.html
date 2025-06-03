@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clima en Del Quisco</title>
+    <title>Clima en Reina Mora, Cerro</title>
     <style>
         :root {
             --bg-color: #f5f5f5;
@@ -70,16 +70,32 @@
             justify-content: space-around;
             margin-top: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 5px;
         }
 
         .detail-item {
-            margin: 5px;
-            min-width: 100px;
-            padding: 10px;
+            margin: 0;
+            padding: 8px 5px;
             background-color: rgba(0,0,0,0.05);
-            border-radius: 10px;
-            flex-grow: 1;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 0;
+            font-size: 15px;
+        }
+
+        .detail-item .label {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 13px;
+            color: var(--secondary-color);
+        }
+
+        .detail-item .value {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
         }
 
         .updated {
@@ -95,8 +111,9 @@
         }
 
         .units {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--secondary-color);
+            margin-left: 2px;
         }
 
         .wind-info {
@@ -107,11 +124,11 @@
 
         /* Estilos para la rosa de los vientos */
         .wind-rose-container {
-            margin-top: 10px;
+            margin-top: 5px;
             position: relative;
-            width: 80px;
-            height: 80px;
-            margin: 5px auto;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
         }
 
         .wind-rose {
@@ -129,18 +146,18 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-bottom: 15px solid var(--wind-color);
-            transform-origin: 50% 40px;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-bottom: 10px solid var(--wind-color);
+            transform-origin: 50% 25px;
             transition: transform 0.5s ease;
             z-index: 2;
         }
 
         .wind-direction-letter {
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 20px;
+            height: 20px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -152,64 +169,70 @@
             font-weight: bold;
             color: var(--wind-color);
             z-index: 3;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            box-shadow: 0 0 3px rgba(0,0,0,0.1);
+            font-size: 10px;
         }
 
         .wind-rose-cardinal {
             position: absolute;
-            font-size: 10px;
+            font-size: 8px;
             color: var(--secondary-color);
         }
 
-        .wind-rose-cardinal.n { top: 2px; left: 50%; transform: translateX(-50%); }
-        .wind-rose-cardinal.e { top: 50%; right: 2px; transform: translateY(-50%); }
-        .wind-rose-cardinal.s { bottom: 2px; left: 50%; transform: translateX(-50%); }
-        .wind-rose-cardinal.w { top: 50%; left: 2px; transform: translateY(-50%); }
+        .wind-rose-cardinal.n { top: 1px; left: 50%; transform: translateX(-50%); }
+        .wind-rose-cardinal.e { top: 50%; right: 1px; transform: translateY(-50%); }
+        .wind-rose-cardinal.s { bottom: 1px; left: 50%; transform: translateX(-50%); }
+        .wind-rose-cardinal.w { top: 50%; left: 1px; transform: translateY(-50%); }
 
         /* Estilos para el pronóstico horario */
         .forecast-container {
             margin-top: 20px;
+            text-align: center;
         }
 
         .forecast-title {
             font-size: 18px;
             margin-bottom: 10px;
             color: var(--primary-color);
-            text-align: left;
             font-weight: bold;
         }
 
         .hourly-forecast {
             display: flex;
+            justify-content: center;
             overflow-x: auto;
-            gap: 15px;
+            gap: 10px;
             padding: 10px 5px;
             scrollbar-width: thin;
+            flex-wrap: wrap;
+            max-width: 100%;
         }
 
         .hour-item {
-            min-width: 80px;
+            min-width: 70px;
             display: flex;
             flex-direction: column;
             align-items: center;
             background-color: rgba(0,0,0,0.05);
-            border-radius: 10px;
-            padding: 10px;
+            border-radius: 8px;
+            padding: 8px;
+            flex-shrink: 0;
         }
 
         .hour-time {
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
+            font-size: 14px;
         }
 
         .hour-temp {
-            font-size: 18px;
+            font-size: 16px;
             margin: 5px 0;
         }
 
         .hour-icon {
-            font-size: 24px;
-            margin: 5px 0;
+            font-size: 20px;
+            margin: 3px 0;
         }
 
         @media (max-width: 480px) {
@@ -218,20 +241,57 @@
             }
             
             .detail-item {
-                min-width: 80px;
-                padding: 8px;
+                padding: 6px 3px;
+                font-size: 14px;
+            }
+            
+            .detail-item .label {
+                font-size: 12px;
+            }
+            
+            .detail-item .value {
+                font-size: 14px;
+            }
+            
+            .wind-rose-container {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .wind-rose-pointer {
+                border-left: 3px solid transparent;
+                border-right: 3px solid transparent;
+                border-bottom: 8px solid var(--wind-color);
+                transform-origin: 50% 20px;
+            }
+            
+            .hourly-forecast {
+                justify-content: flex-start;
+                flex-wrap: nowrap;
             }
             
             .hour-item {
-                min-width: 70px;
-                padding: 8px;
+                min-width: 60px;
+                padding: 6px;
+            }
+            
+            .hour-time {
+                font-size: 12px;
+            }
+            
+            .hour-temp {
+                font-size: 14px;
+            }
+            
+            .hour-icon {
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
     <div class="weather-card">
-        <div class="location">Del Quisco, Reina Mora</div>
+        <div class="location">Reina Mora, Cerro</div>
         <div>Altitud: 1000 msnm</div>
         
         <div id="weather-icon" class="weather-icon"></div>
@@ -243,13 +303,13 @@
         
         <div class="details">
             <div class="detail-item">
-                <div>Humedad</div>
-                <div id="humidity">--<span class="units"> %</span></div>
+                <span class="label">Humedad</span>
+                <span class="value" id="humidity">--<span class="units">%</span></span>
             </div>
             <div class="detail-item">
-                <div>Viento</div>
-                <div class="wind-info">
-                    <span id="wind">--<span class="units"> km/h</span></span>
+                <span class="label">Viento</span>
+                <div class="value">
+                    <span id="wind">--<span class="units">km/h</span></span>
                     <div class="wind-rose-container">
                         <div class="wind-rose">
                             <div class="wind-rose-pointer" id="wind-pointer"></div>
@@ -263,8 +323,8 @@
                 </div>
             </div>
             <div class="detail-item">
-                <div>Precipitación</div>
-                <div id="precipitation">--<span class="units"> mm</span></div>
+                <span class="label">Precipitación</span>
+                <span class="value" id="precipitation">--<span class="units">mm</span></span>
             </div>
         </div>
         
@@ -295,7 +355,7 @@
                     
                     // Actualizar la interfaz
                     document.getElementById('temperature').textContent = `${adjustedTemp}°C`;
-                    document.getElementById('humidity').textContent = `${data.current.relative_humidity_2m}%`;
+                    document.getElementById('humidity').textContent = `${data.current.relative_humidity_2m}`;
                     document.getElementById('wind').textContent = `${Math.round(data.current.wind_speed_10m)}`;
                     document.getElementById('precipitation').textContent = `${data.current.precipitation}`;
                     
