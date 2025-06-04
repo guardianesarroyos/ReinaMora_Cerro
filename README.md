@@ -14,7 +14,7 @@ Brindar a los **vecinos de la zona serrana** una herramienta confiable para cons
 ## Características
 
 - Datos meteorológicos online ajustados localmente.
-- Cálculos de temperatura y presión en función de la altitud respecto al aeropuerto.
+- Cálculos de temperatura y presión en función de la altitud respecto al aeropuerto y de estaciones meteo en cerros.
 - Estimaciones locales de viento y lluvia.
 - Visualización clara y minimalista, pensada para celulares.
 - Soporte para modo oscuro.
