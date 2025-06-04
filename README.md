@@ -22,7 +22,7 @@ Brindar a los **vecinos de la zona serrana** una herramienta confiable para cons
 
 ## ¿Cómo funciona?
 
-1. La app toma datos en tiempo real desde la estación meteorológica del Aeropuerto de Bariloche.
+1. La app toma datos en tiempo real desde la estaciones colaborativas meteo privadas Red Wunderground y Open-Meteo.
 2. Aplica fórmulas y ajustes personalizados según la altitud y condiciones del lugar.
 3. Muestra los valores resultantes adaptados a la ubicación de la casa de montaña.
 4. A futuro, los vecinos podrán cargar sus observaciones para **ajustar y calibrar** los modelos de cálculo.
