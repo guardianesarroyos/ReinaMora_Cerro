@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reina Mora - Datos Meteorológicos</title>
+  <title>Bariloche Cerros - Datos Meteorológicos</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
@@ -112,17 +112,6 @@
       color: var(--texto-secundario);
     }
     
-    .dato-lluvia-estimado {
-      position: relative;
-    }
-    
-    .dato-lluvia-estimado::after {
-      content: "†";
-      font-size: 0.6rem;
-      vertical-align: super;
-      color: var(--color-secundario);
-    }
-    
     @media (max-width: 480px) {
       .datos-container {
         grid-template-columns: 1fr;
@@ -144,12 +133,18 @@
         flex: 1;
       }
     }
+
+    /* Estilos para errores */
+    .error {
+      color: #ff6b6b;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
   <div class="contenedor">
     <div class="encabezado">
-      <h1><i class="fas fa-mountain"></i> Reina Mora</h1>
+      <h1><i class="fas fa-mountain"></i> Bari Cerros</h1>
       <h2>Monitoreo Meteorológico</h2>
     </div>
     
@@ -157,7 +152,7 @@
     <div class="tarjeta-estacion">
       <div class="nombre-estacion">
         <i class="fas fa-cloud-sun"></i>
-        <span>Lomas de Cauquen (933 mts) - IDEPAR37</span>
+        <span>Reina Mora, Cerro (933 mts)</span>
       </div>
       
       <div class="datos-container">
@@ -201,7 +196,7 @@
     <div class="tarjeta-estacion">
       <div class="nombre-estacion">
         <i class="fas fa-snowflake"></i>
-        <span>Villa Catedral (1070 mts) - IBARIL29</span>
+        <span>Villa Catedral (1070 mts)</span>
       </div>
       
       <div class="datos-container">
@@ -243,165 +238,124 @@
     
     <div class="footer">
       <p>Actualización automática cada 5 minutos</p>
-      <p>Datos proporcionados por estaciones meteorológicas locales</p>
-      <p class="dato-lluvia-estimado" style="display: inline-block; margin-top: 0.5rem;">† Valor estimado cuando no hay datos precisos</p>
+      <p>Datos proporcionados por Open-Meteo y OpenWeather</p>
     </div>
   </div>
 
   <script>
-    // Configuración final
+    // Configuración de estaciones (¡Actualiza las coordenadas!)
     const estaciones = {
-      IDEPAR37: {
-        nombre: "Lomas de Cauquen (900 mts)",
-        prefijo: "principal"
+      principal: {
+        nombre: "Reina Mora, Cerro",
+        lat: -41.185470,  // Cambia por tus coordenadas reales
+        lon: -71.371370,
+        altitud: "933 mts"
       },
-      IBARIL29: {
-        nombre: "Villa Catedral (1070 mts)",
-        prefijo: "secundaria"
+      secundaria: {
+        nombre: "Villa Catedral",
+        lat: -41.1667,  // Coordenadas del Cerro Catedral
+        lon: -71.4333,
+        altitud: "1070 mts"
       }
     };
-    
-    const apiKey = "6532d6454b8aa370768e63d6ba5a832e";
-    const intervaloActualizacion = 10 * 60 * 1000; // 5 minutos
-    
-    // Función para formatear hora
-    function formatearHora(fecha) {
-      return new Date(fecha).toLocaleTimeString('es-AR', { 
-        hour: '2-digit', 
-        minute: '2-digit'
-      });
-    }
-    
-    // Función para obtener lluvia acumulada en 24h
-    async function obtenerLluvia24h(idEstacion) {
+
+    // API Keys de OpenWeather (backup)
+    const OPENWEATHER_KEYS = [
+      "7cc8d8cf7132492c8e5cff1c94a9bcd3df4359c7e0ac491e9f323747c08e5069",
+      "ea76122029c94fb2834f9b8e848916107c325d4888044a0589e904b791aeecbb"
+    ];
+
+    // --- Funciones principales ---
+    async function obtenerDatosOpenMeteo(lat, lon) {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,rain,wind_speed_10m,relative_humidity_2m&timezone=auto`;
       try {
-        // 1. Intentamos con el endpoint diario
-        const fechaActual = new Date();
-        const fechaAyer = new Date(fechaActual);
-        fechaAyer.setDate(fechaAyer.getDate() - 1);
-        
-        const urlDiario = `https://api.weather.com/v2/pws/history/daily?stationId=${idEstacion}&format=json&units=m&apiKey=${apiKey}&startDate=${fechaAyer.toISOString().split('T')[0]}&endDate=${fechaActual.toISOString().split('T')[0]}`;
-        
-        const response = await fetch(urlDiario);
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Error en respuesta");
         const data = await response.json();
-        
-        if (data.observations?.length > 0) {
-          const lluvia = data.observations[0].metric.precipTotal;
-          if (lluvia !== undefined) {
-            return {
-              valor: lluvia.toFixed(1),
-              estimado: false
-            };
-          }
-        }
-        
-        // 2. Si falla, intentamos con histórico horario
-        const urlHorario = `https://api.weather.com/v2/pws/history/hourly?stationId=${idEstacion}&format=json&units=m&apiKey=${apiKey}&startDate=${fechaAyer.toISOString().split('T')[0]}`;
-        
-        const responseHorario = await fetch(urlHorario);
-        const dataHorario = await responseHorario.json();
-        
-        if (dataHorario.observations?.length > 0) {
-          const lluvia24h = dataHorario.observations.reduce((total, obs) => {
-            return total + (obs.metric.precipTotal || 0);
-          }, 0);
-          
-          return {
-            valor: lluvia24h.toFixed(1),
-            estimado: false
-          };
-        }
+        return {
+          temperatura: data.current.temperature_2m,
+          sensacionTermica: data.current.apparent_temperature,
+          viento: (data.current.wind_speed_10m * 3.6).toFixed(1), // m/s → km/h
+          lluvia: data.current.rain || "0.0",
+          actualizacion: new Date().toISOString(),
+          fuente: "Open-Meteo"
+        };
       } catch (error) {
-        console.error("Error al obtener lluvia 24h:", error);
-      }
-      
-      // 3. Si todo falla, retornamos 0.0 como estimado
-      return {
-        valor: "0.0",
-        estimado: true
-      };
-    }
-    
-    // Obtener datos actuales de una estación
-    async function obtenerDatosEstacion(idEstacion) {
-      try {
-        const url = `https://api.weather.com/v2/pws/observations/current?stationId=${idEstacion}&format=json&units=m&apiKey=${apiKey}`;
-        const respuesta = await fetch(url);
-        
-        if (!respuesta.ok) throw new Error("Error en la respuesta");
-        
-        const datos = await respuesta.json();
-        
-        if (datos.observations?.length > 0) {
-          const obs = datos.observations[0].metric;
-          const lluvia24h = await obtenerLluvia24h(idEstacion);
-          
-          return {
-            temperatura: obs.temp,
-            sensacionTermica: obs.heatIndex || obs.windChill || obs.temp,
-            viento: obs.windSpeed,
-            lluvia: lluvia24h.valor,
-            lluviaEstimada: lluvia24h.estimado,
-            actualizacion: datos.observations[0].obsTimeLocal
-          };
-        }
-      } catch (error) {
-        console.error(`Error obteniendo datos de ${idEstacion}:`, error);
+        console.error("Open-Meteo falló:", error);
         return null;
       }
     }
-    
-    // Actualizar interfaz de una estación
-    function actualizarInterfazEstacion(datos, idEstacion) {
+
+    async function obtenerDatosOpenWeather(lat, lon, apiKey) {
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("API key puede ser inválida");
+        const data = await response.json();
+        return {
+          temperatura: data.main.temp,
+          sensacionTermica: data.main.feels_like,
+          viento: (data.wind.speed * 3.6).toFixed(1), // m/s → km/h
+          lluvia: data.rain?.["1h"] || "0.0",
+          actualizacion: new Date().toISOString(),
+          fuente: `OpenWeather (key ${apiKey.slice(0, 5)}...)`
+        };
+      } catch (error) {
+        console.error(`OpenWeather falló con key ${apiKey.slice(0, 5)}:`, error);
+        return null;
+      }
+    }
+
+    // Intenta con todas las fuentes hasta obtener datos
+    async function obtenerDatosConFallback(lat, lon) {
+      // 1. Intentar con Open-Meteo primero
+      let datos = await obtenerDatosOpenMeteo(lat, lon);
+      if (datos) return datos;
+
+      // 2. Si falla, probar con cada API key de OpenWeather
+      for (const key of OPENWEATHER_KEYS) {
+        datos = await obtenerDatosOpenWeather(lat, lon, key);
+        if (datos) return datos;
+      }
+
+      // 3. Si todo falla
+      return null;
+    }
+
+    // Actualizar la interfaz
+    function actualizarInterfazEstacion(datos, prefijo) {
+      const contenedor = document.getElementById(`actualizacion-${prefijo}`);
+      
       if (!datos) {
-        document.getElementById(`actualizacion-${estaciones[idEstacion].prefijo}`)
-          .textContent = "Error cargando datos";
+        contenedor.textContent = "Error: No se pudieron cargar datos";
+        contenedor.classList.add("error");
         return;
       }
-      
-      const prefijo = estaciones[idEstacion].prefijo;
-      
+
       // Actualizar valores
-      document.getElementById(`temp-${prefijo}`).textContent = 
-        `${datos.temperatura?.toFixed(1) || '--'} °C`;
-      document.getElementById(`st-${prefijo}`).textContent = 
-        `${datos.sensacionTermica?.toFixed(1) || '--'} °C`;
-      document.getElementById(`viento-${prefijo}`).textContent = 
-        `${datos.viento?.toFixed(1) || '--'} km/h`;
-      
-      // Manejo especial de lluvia
-      const lluviaElement = document.getElementById(`lluvia-${prefijo}`);
-      lluviaElement.textContent = `${datos.lluvia || '0.0'} mm`;
-      
-      if (datos.lluviaEstimada) {
-        lluviaElement.classList.add('dato-lluvia-estimado');
-        lluviaElement.title = "Valor estimado (no se pudo obtener dato preciso)";
-      } else {
-        lluviaElement.classList.remove('dato-lluvia-estimado');
-        lluviaElement.removeAttribute('title');
-      }
-      
-      // Actualizar marca de tiempo
-      const horaActualizacion = formatearHora(datos.actualizacion);
-      document.getElementById(`actualizacion-${prefijo}`).textContent = 
-        `Actualizado: ${horaActualizacion}`;
+      document.getElementById(`temp-${prefijo}`).textContent = `${datos.temperatura} °C`;
+      document.getElementById(`st-${prefijo}`).textContent = `${datos.sensacionTermica} °C`;
+      document.getElementById(`viento-${prefijo}`).textContent = `${datos.viento} km/h`;
+      document.getElementById(`lluvia-${prefijo}`).textContent = `${datos.lluvia} mm`;
+
+      // Mostrar fuente y hora
+      const hora = new Date(datos.actualizacion).toLocaleTimeString("es-AR");
+      contenedor.textContent = `Actualizado: ${hora} (Fuente: ${datos.fuente})`;
+      contenedor.classList.remove("error");
     }
-    
+
     // Actualizar todas las estaciones
     async function actualizarTodasEstaciones() {
-      for (const idEstacion of Object.keys(estaciones)) {
-        const datos = await obtenerDatosEstacion(idEstacion);
-        actualizarInterfazEstacion(datos, idEstacion);
+      for (const [prefijo, estacion] of Object.entries(estaciones)) {
+        const datos = await obtenerDatosConFallback(estacion.lat, estacion.lon);
+        actualizarInterfazEstacion(datos, prefijo);
       }
     }
-    
+
     // Inicialización
-    document.addEventListener('DOMContentLoaded', () => {
-      // Primera actualización inmediata
+    document.addEventListener("DOMContentLoaded", () => {
       actualizarTodasEstaciones();
-      
-      // Actualización periódica cada 5 minutos
-      setInterval(actualizarTodasEstaciones, intervaloActualizacion);
+      setInterval(actualizarTodasEstaciones, 5 * 60 * 1000); // Actualizar cada 5 minutos
     });
   </script>
 </body>
