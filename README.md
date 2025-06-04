@@ -3,7 +3,7 @@
 
 ## Descripción
 
-Esta es una app meteorológica personalizada pensada para una **casa de montaña** ubicada en una zona serrana vecina a la ciudad de **San Carlos de Bariloche**. Su función principal es mostrar variables meteorológicas básicas (temperatura, viento, lluvia, etc.) ajustadas a las **condiciones reales del lugar**, a partir de datos tomados desde estaciones privadas con datos públicos.
+Esta es una app meteorológica personalizada pensada para una **casa de montaña** ubicada en una zona de altura serrana vecina a la ciudad de **San Carlos de Bariloche**. Su función principal es mostrar variables meteorológicas básicas (temperatura, viento, lluvia, etc.) ajustadas a las **condiciones reales del lugar**, a partir de datos tomados desde estaciones privadas con datos públicos.
 
 Los datos son **recalculados con criterios locales** para reflejar mejor el estado del tiempo en esta zona específica, considerando la diferencia de altitud, orientación y microclima.
 
