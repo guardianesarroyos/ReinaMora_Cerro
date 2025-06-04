@@ -13,8 +13,8 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         body {
-            background-color: #e8e8e8;
-            color: #333;
+            background-color: #606060; /* Fondo general más oscuro */
+            color: #e0e0e0; /* Texto más claro para mejor contraste */
             padding: 10px;
             max-width: 100vw;
             overflow: hidden;
@@ -63,16 +63,16 @@
             }
         }
         .app-container {
-    background: linear-gradient(to bottom, #d0e6f7, #a0c4f7);
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 4px 8px rgba(0, 50, 100, 0.1);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    max-height: 100vh;
-    border: 1px solid #8bbbe7;
-}
+            background: linear-gradient(to bottom, #505050, #404040); /* Gradiente gris oscuro */
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-height: 100vh;
+            border: 1px solid #707070;
+        }
         .header {
             text-align: center;
             margin-bottom: 15px;
@@ -92,12 +92,12 @@
             margin-bottom: 10px;
         }
         .station-primary {
-            background-color: #f8f8f8;
+            background-color: #454545 !important; /* Gris oscuro */
             border-left: 5px solid #ff7b25;
             flex-direction: column;
         }
         .station-secondary {
-            background-color: #eeeeee;
+            background-color: #383838 !important; /* Gris más oscuro */
             border-left: 3px solid #ff9e4a;
             flex-direction: column;
         }
@@ -170,6 +170,7 @@
             position: absolute;
             font-size: 0.6rem;
             font-weight: bold;
+            color: #e0e0e0; /* Texto más claro */
         }
         .wind-speed {
             font-size: 0.9rem;
@@ -203,7 +204,7 @@
         }
         .rain-selector button {
             flex: 1;
-            background-color: #f0f0f0;
+            background-color: #383838 !important; /* Gris oscuro */
             border: 1px solid #ff7b25;
             border-radius: 4px;
             padding: 4px 0;
@@ -214,11 +215,11 @@
             text-align: center;
         }
         .rain-selector button.active {
-            background-color: #ff7b25;
-            color: white;
+            background-color: #ff7b25 !important;
+            color: white !important;
         }
         .forecast {
-            background-color: #f8f8f8;
+            background-color: #454545 !important; /* Gris oscuro */
             border-radius: 12px;
             padding: 12px;
             margin-top: 5px;
@@ -248,6 +249,7 @@
         .forecast-day .icon {
             font-size: 1.5rem;
             margin: 5px 0;
+            color: #e0e0e0;
         }
         .forecast-day .temp-range {
             font-size: 0.75rem;
