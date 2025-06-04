@@ -144,7 +144,7 @@
 <body>
   <div class="contenedor">
     <div class="encabezado">
-      <h1><i class="fas fa-mountain"></i> Bari Cerros</h1>
+      <h1><i class="fas fa-mountain"></i> Bariloche Cerros</h1>
       <h2>Monitoreo Meteorológico</h2>
     </div>
     
@@ -243,17 +243,17 @@
   </div>
 
   <script>
-    // Configuración de estaciones (¡Actualiza las coordenadas!)
+    // Configuración de estaciones
     const estaciones = {
       principal: {
         nombre: "Reina Mora, Cerro",
-        lat: -41.185470,  // Cambia por tus coordenadas reales
+        lat: -41.185470,
         lon: -71.371370,
         altitud: "933 mts"
       },
       secundaria: {
         nombre: "Villa Catedral",
-        lat: -41.1667,  // Coordenadas del Cerro Catedral
+        lat: -41.1667,
         lon: -71.4333,
         altitud: "1070 mts"
       }
@@ -275,7 +275,7 @@
         return {
           temperatura: data.current.temperature_2m,
           sensacionTermica: data.current.apparent_temperature,
-          viento: (data.current.wind_speed_10m * 3.6).toFixed(1), // m/s → km/h
+          viento: data.current.wind_speed_10m.toFixed(1), // Ya está en km/h, sin multiplicar por 3.6
           lluvia: data.current.rain || "0.0",
           actualizacion: new Date().toISOString(),
           fuente: "Open-Meteo"
@@ -295,7 +295,7 @@
         return {
           temperatura: data.main.temp,
           sensacionTermica: data.main.feels_like,
-          viento: (data.wind.speed * 3.6).toFixed(1), // m/s → km/h
+          viento: data.wind.speed.toFixed(1), // Ya está en km/h con units=metric, sin multiplicar por 3.6
           lluvia: data.rain?.["1h"] || "0.0",
           actualizacion: new Date().toISOString(),
           fuente: `OpenWeather (key ${apiKey.slice(0, 5)}...)`
