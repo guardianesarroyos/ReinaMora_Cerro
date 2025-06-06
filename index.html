@@ -120,7 +120,7 @@
             font-weight: bold;
             color: #ff7b25;
             line-height: 1;
-            margin-bottom: 10px; /* Añadido para compensar la falta de feels-like */
+            margin-bottom: 10px;
         }
         .station-secondary .temp-highlight {
             font-size: 1.8rem;
@@ -247,6 +247,10 @@
             font-size: 0.75rem;
             color: #ff9e4a;
         }
+        .forecast-day .precip-info {
+            font-size: 0.6rem;
+            margin-top: 3px;
+        }
         .footer {
             text-align: center;
             font-size: 0.7rem;
@@ -271,6 +275,12 @@
             margin-top: 5px;
             cursor: pointer;
             font-size: 0.7rem;
+        }
+        .forecast-update {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-bottom: 5px;
+            color: #ff9e4a;
         }
     </style>
 </head>
@@ -363,22 +373,9 @@
         <!-- Pronóstico Extendido -->
         <div class="forecast">
             <h3>Pronóstico Reina Mora, Cerro</h3>
+            <div class="forecast-update">Actualizado: <span id="forecast-update-time">--:--</span></div>
             <div class="forecast-days" id="forecast-container">
-                <div class="forecast-day">
-                    <div class="day">Hoy</div>
-                    <div class="icon">⛅</div>
-                    <div class="temp-range">--° / --°</div>
-                </div>
-                <div class="forecast-day">
-                    <div class="day">Mañana</div>
-                    <div class="icon">--</div>
-                    <div class="temp-range">--° / --°</div>
-                </div>
-                <div class="forecast-day">
-                    <div class="day">Pasado</div>
-                    <div class="icon">--</div>
-                    <div class="temp-range">--° / --°</div>
-                </div>
+                <!-- Los días se cargarán dinámicamente -->
             </div>
         </div>
 
@@ -418,7 +415,7 @@
             errorElement.style.display = 'block';
         }
 
-        // Función para obtener datos de Wunderground (simplificada)
+        // Función para obtener datos de Wunderground
         async function obtenerDatosWunderground(stationId) {
             try {
                 const response = await fetch(`https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=m&apiKey=6532d6454b8aa370768e63d6ba5a832e`);
@@ -445,7 +442,7 @@
             }
         }
 
-        // Función para actualizar la interfaz (sin sensación térmica)
+        // Función para actualizar la interfaz
         function actualizarEstacion(datos, prefijo) {
             if (datos.error) {
                 mostrarError(datos.message, prefijo);
@@ -468,26 +465,90 @@
             document.getElementById(`error-${prefijo}`).style.display = 'none';
         }
 
-        // Función para cargar pronóstico (simulada)
+        // Función para mapear códigos de icono a emojis
+        function obtenerIcono(codigo) {
+            const iconos = {
+                0: '☀️',   1: '☀️',   2: '⛅',   3: '⛅',   4: '☁️',   
+                5: '🌧️',   6: '🌧️',   7: '🌨️',   8: '❄️',   9: '🌧️',  
+                10: '🌧️', 11: '🌫️', 12: '⛈️', 13: '🌨️', 14: '🌨️',  
+                15: '🌨️', 16: '❄️', 17: '⛈️', 18: '🌧️', 19: '🌫️',  
+                20: '🌫️', 21: '🌫️', 22: '🔥', 23: '💨', 24: '💨',  
+                25: '❄️', 26: '🌫️', 27: '🌙', 28: '🌙⛅', 29: '🌙⛅',  
+                30: '🌙☁️', 31: '🌙', 32: '💨', 33: '🌙', 34: '🌙⛅',  
+                35: '🌙⛅', 36: '🔥', 37: '⛈️', 38: '⛈️', 39: '🌧️',  
+                40: '🌧️', 41: '🌨️', 42: '🌨️', 43: '🌨️', 44: '⛅',  
+                45: '⛈️', 46: '🌨️', 47: '⛈️'
+            };
+            return iconos[codigo] || '─';
+        }
+
+        // Función para cargar pronóstico real desde la API
         async function cargarPronostico() {
             try {
-                // Simulación - reemplazar con API real
+                const response = await fetch(`https://api.weather.com/v3/wx/forecast/daily/3day?stationId=IDEPAR37&format=json&units=m&apiKey=6532d6454b8aa370768e63d6ba5a832e`);
+                
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                
+                const data = await response.json();
+                
+                // Verificar estructura de datos
+                if (!data.calendarDayTemperatureMax || !data.calendarDayTemperatureMin || !data.daypart) {
+                    throw new Error("Estructura de datos de pronóstico no reconocida");
+                }
+
+                // Mapear los datos de la API
                 const pronosticos = [
-                    { day: "Hoy", icon: "⛅", temp: "8° / 15°" },
-                    { day: "Mañana", icon: "🌧️", temp: "6° / 12°" },
-                    { day: "Pasado", icon: "❄️", temp: "2° / 8°" }
+                    {
+                        day: "Hoy",
+                        icon: obtenerIcono(data.daypart[0].iconCode[0]),
+                        tempMax: data.calendarDayTemperatureMax[0],
+                        tempMin: data.calendarDayTemperatureMin[0],
+                        precip: data.daypart[0].qpf[0] || 0,
+                        snow: data.daypart[0].qpfSnow[0] || 0
+                    },
+                    {
+                        day: "Mañana",
+                        icon: obtenerIcono(data.daypart[0].iconCode[2]),
+                        tempMax: data.calendarDayTemperatureMax[1],
+                        tempMin: data.calendarDayTemperatureMin[1],
+                        precip: data.daypart[0].qpf[2] || 0,
+                        snow: data.daypart[0].qpfSnow[2] || 0
+                    },
+                    {
+                        day: "Pasado",
+                        icon: obtenerIcono(data.daypart[0].iconCode[4]),
+                        tempMax: data.calendarDayTemperatureMax[2],
+                        tempMin: data.calendarDayTemperatureMin[2],
+                        precip: data.daypart[0].qpf[4] || 0,
+                        snow: data.daypart[0].qpfSnow[4] || 0
+                    }
                 ];
 
+                // Actualizar la interfaz
                 const container = document.getElementById('forecast-container');
                 container.innerHTML = pronosticos.map(item => `
                     <div class="forecast-day">
                         <div class="day">${item.day}</div>
                         <div class="icon">${item.icon}</div>
-                        <div class="temp-range">${item.temp}</div>
+                        <div class="temp-range">${Math.round(item.tempMax)}° / ${Math.round(item.tempMin)}°</div>
+                        <div class="precip-info">
+                            ${item.precip > 0 ? '💧' + item.precip.toFixed(1) + 'mm' : ''} 
+                            ${item.snow > 0 ? '❄️' + item.snow.toFixed(1) + 'cm' : ''}
+                        </div>
                     </div>
                 `).join('');
+
+                // Actualizar timestamp
+                document.getElementById('forecast-update-time').textContent = new Date().toLocaleTimeString('es-AR');
+                
             } catch (error) {
                 console.error("Error cargando pronóstico:", error);
+                document.getElementById('forecast-container').innerHTML = `
+                    <div class="forecast-day" style="flex:1;text-align:center;">
+                        <div class="error">Error cargando pronóstico</div>
+                    </div>
+                `;
+                document.getElementById('forecast-update-time').textContent = "Error";
             }
         }
 
@@ -495,6 +556,7 @@
         async function actualizarDatos() {
             try {
                 document.getElementById('update-time').textContent = "Actualizando...";
+                document.getElementById('forecast-update-time').textContent = "Actualizando...";
                 
                 const datosPrincipal = await obtenerDatosWunderground(estaciones.principal.id);
                 actualizarEstacion(datosPrincipal, 'principal');
@@ -508,6 +570,7 @@
                 console.error("Error general:", error);
                 mostrarError("Error al actualizar datos", 'principal');
                 mostrarError("Error al actualizar datos", 'secundaria');
+                document.getElementById('forecast-update-time').textContent = "Error";
             }
         }
 
