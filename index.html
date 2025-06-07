@@ -41,6 +41,10 @@
                 background-color: #1a1a1a !important;
                 border-left: 3px solid #ff7b25 !important;
             }
+            .station-tertiary {
+                background-color: #1a1a1a !important;
+                border-left: 3px solid #4a90e2 !important;
+            }
             .header h1, .station-primary .station-name, .forecast h3 {
                 color: #ff7b25 !important;
                 text-shadow: 0 0 5px rgba(255, 123, 37, 0.3);
@@ -97,6 +101,11 @@
             border-left: 3px solid #ff9e4a;
             flex-direction: column;
         }
+        .station-tertiary {
+            background-color: #454545 !important;
+            border-left: 3px solid #4a90e2;
+            flex-direction: column;
+        }
         .station-name {
             font-weight: bold;
             font-size: 1.1rem;
@@ -105,6 +114,9 @@
         }
         .station-secondary .station-name {
             color: #ff9e4a;
+        }
+        .station-tertiary .station-name {
+            color: #4a90e2;
         }
         .station-data {
             display: flex;
@@ -126,6 +138,10 @@
             font-size: 1.8rem;
             color: #ff9e4a;
         }
+        .station-tertiary .temp-highlight {
+            font-size: 1.8rem;
+            color: #4a90e2;
+        }
         .wind-container {
             display: flex;
             flex-direction: column;
@@ -145,6 +161,12 @@
             border: 2px solid #ff7b25;
             border-radius: 50%;
             position: relative;
+        }
+        .station-secondary .compass-circle {
+            border-color: #ff9e4a;
+        }
+        .station-tertiary .compass-circle {
+            border-color: #4a90e2;
         }
         .compass-arrow {
             position: absolute;
@@ -170,11 +192,20 @@
             text-align: center;
             font-weight: bold;
         }
+        .station-secondary .wind-speed {
+            color: #ff9e4a;
+        }
+        .station-tertiary .wind-speed {
+            color: #4a90e2;
+        }
         .wind-gust {
             font-size: 0.75rem;
             color: #ff9e4a;
             text-align: center;
             margin-top: 3px;
+        }
+        .station-tertiary .wind-gust {
+            color: #4a90e2;
         }
         .rain-container {
             display: flex;
@@ -188,6 +219,12 @@
             color: #ff7b25;
             margin: 5px 0;
             text-align: center;
+        }
+        .station-secondary .rain-amount {
+            color: #ff9e4a;
+        }
+        .station-tertiary .rain-amount {
+            color: #4a90e2;
         }
         .rain-selector {
             display: flex;
@@ -206,9 +243,23 @@
             margin: 0 2px;
             text-align: center;
         }
+        .station-secondary .rain-selector button {
+            border-color: #ff9e4a;
+            color: #ff9e4a;
+        }
+        .station-tertiary .rain-selector button {
+            border-color: #4a90e2;
+            color: #4a90e2;
+        }
         .rain-selector button.active {
             background-color: #ff7b25 !important;
             color: white !important;
+        }
+        .station-secondary .rain-selector button.active {
+            background-color: #ff9e4a !important;
+        }
+        .station-tertiary .rain-selector button.active {
+            background-color: #4a90e2 !important;
         }
         .forecast {
             background-color: #383838 !important;
@@ -333,7 +384,7 @@
 
         <!-- Estación Cerro Catedral (Secundaria) -->
         <div class="station station-secondary">
-            <div class="station-name">Cerro Catedral (1070 m.s.n.m)</div>
+            <div class="station-name">Base Cerro Catedral (1070 m.s.n.m)</div>
             <div class="station-data">
                 <div class="data-column">
                     <div class="temp-highlight" id="temp-secundaria">--°C</div>
@@ -370,6 +421,45 @@
             <div class="error" id="error-secundaria"></div>
         </div>
 
+        <!-- Estación Cerro Otto (Terciaria) -->
+        <div class="station station-tertiary">
+            <div class="station-name">Cerro Otto, parapente (1422 m.s.n.m)</div>
+            <div class="station-data">
+                <div class="data-column">
+                    <div class="temp-highlight" id="temp-terciaria">--°C</div>
+                </div>
+                <div class="data-column">
+                    <div class="wind-container">
+                        <div class="wind-rose">
+                            <div class="compass-circle">
+                                <div class="compass-arrow" id="wind-arrow-terciaria"></div>
+                                <div class="compass-direction" style="top: 2px; left: 50%; transform: translateX(-50%);">N</div>
+                                <div class="compass-direction" style="bottom: 2px; left: 50%; transform: translateX(-50%);">S</div>
+                                <div class="compass-direction" style="top: 50%; left: 2px; transform: translateY(-50%);">O</div>
+                                <div class="compass-direction" style="top: 50%; right: 2px; transform: translateY(-50%);">E</div>
+                            </div>
+                        </div>
+                        <div class="wind-speed" id="wind-speed-terciaria">-- km/h (--)</div>
+                        <div class="wind-gust" id="wind-gust-terciaria">Ráfagas: -- km/h</div>
+                    </div>
+                </div>
+                <div class="data-column">
+                    <div class="rain-container">
+                        <div class="rain-amount" id="rain-terciaria">
+                            <div>Lluvia 24h: -- mm</div>
+                            <div>Nieve: -- cm</div>
+                        </div>
+                        <div class="rain-selector">
+                            <button class="active" data-period="24h">24h</button>
+                            <button data-period="48h">48h</button>
+                            <button data-period="72h">72h</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="error" id="error-terciaria"></div>
+        </div>
+
         <!-- Pronóstico Extendido -->
         <div class="forecast">
             <h3>Pronóstico Reina Mora, Cerro</h3>
@@ -396,6 +486,12 @@
                 nombre: "Cerro Catedral",
                 elevacion: "1070 m.s.n.m",
                 url: "https://api.weather.com/v2/pws/observations/current?stationId=IBARIL29&format=json&units=m&apiKey=6532d6454b8aa370768e63d6ba5a832e"
+            },
+            terciaria: {
+                id: "IDEPAR138",
+                nombre: "Cerro Otto",
+                elevacion: "1422 m.s.n.m",
+                url: "https://api.weather.com/v2/pws/observations/current?stationId=IDEPAR138&format=json&units=m&apiKey=6532d6454b8aa370768e63d6ba5a832e"
             }
         };
 
@@ -651,6 +747,9 @@
                 const datosSecundaria = await obtenerDatosWunderground(estaciones.secundaria.id);
                 actualizarEstacion(datosSecundaria, 'secundaria');
 
+                const datosTerciaria = await obtenerDatosWunderground(estaciones.terciaria.id);
+                actualizarEstacion(datosTerciaria, 'terciaria');
+
                 // Pronóstico
                 await cargarPronostico();
 
@@ -658,6 +757,7 @@
                 console.error("Error general:", error);
                 mostrarError("Error al actualizar datos", 'principal');
                 mostrarError("Error al actualizar datos", 'secundaria');
+                mostrarError("Error al actualizar datos", 'terciaria');
                 document.getElementById('forecast-update-time').textContent = "Error";
             }
         }
