@@ -15,12 +15,12 @@
         body {
             background-color: #606060;
             color: #e0e0e0;
-            padding: 10px;
+            padding: 8px;
             max-width: 100vw;
-            overflow: hidden;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            scroll-behavior: smooth;
         }
         @media (prefers-color-scheme: dark) {
             body {
@@ -64,32 +64,46 @@
         }
         .app-container {
             background: linear-gradient(to bottom, #505050, #404040);
-            border-radius: 15px;
-            padding: 15px;
+            border-radius: 12px;
+            padding: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             flex: 1;
             display: flex;
             flex-direction: column;
-            max-height: 100vh;
             border: 1px solid #707070;
+            overflow-y: auto;
+            max-height: calc(100vh - 16px);
         }
         .header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
+            position: sticky;
+            top: 0;
+            background: inherit;
+            z-index: 10;
+            padding-bottom: 8px;
         }
         .header h1 {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: #ff7b25;
+            margin-bottom: 2px;
         }
         .header p {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #ff9e4a;
+            margin-bottom: 5px;
+        }
+        .stations-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .station {
             display: flex;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            padding: 8px;
         }
         .station-primary {
             background-color: #383838 !important;
@@ -108,8 +122,8 @@
         }
         .station-name {
             font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 10px;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
             color: #ff7b25;
         }
         .station-secondary .station-name {
@@ -125,21 +139,21 @@
         .data-column {
             flex: 1;
             min-width: 0;
-            padding: 0 5px;
+            padding: 0 3px;
         }
         .temp-highlight {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #ff7b25;
             line-height: 1;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
         .station-secondary .temp-highlight {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: #ff9e4a;
         }
         .station-tertiary .temp-highlight {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: #4a90e2;
         }
         .wind-container {
@@ -150,10 +164,10 @@
             height: 100%;
         }
         .wind-rose {
-            width: 70px;
-            height: 70px;
+            width: 55px;
+            height: 55px;
             position: relative;
-            margin: 5px 0;
+            margin: 3px 0;
         }
         .compass-circle {
             width: 100%;
@@ -172,22 +186,22 @@
             position: absolute;
             width: 0;
             height: 0;
-            top: 5px;
+            top: 3px;
             left: 50%;
             transform: translateX(-50%);
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-bottom: 25px solid #e74c3c;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 20px solid #e74c3c;
             z-index: 2;
         }
         .compass-direction {
             position: absolute;
-            font-size: 0.6rem;
+            font-size: 0.5rem;
             font-weight: bold;
             color: #e0e0e0;
         }
         .wind-speed {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: #ff7b25;
             text-align: center;
             font-weight: bold;
@@ -199,10 +213,10 @@
             color: #4a90e2;
         }
         .wind-gust {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: #ff9e4a;
             text-align: center;
-            margin-top: 3px;
+            margin-top: 2px;
         }
         .station-tertiary .wind-gust {
             color: #4a90e2;
@@ -214,10 +228,10 @@
             height: 100%;
         }
         .rain-amount {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: bold;
             color: #ff7b25;
-            margin: 5px 0;
+            margin: 3px 0;
             text-align: center;
         }
         .station-secondary .rain-amount {
@@ -229,18 +243,18 @@
         .rain-selector {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
+            margin-top: 6px;
         }
         .rain-selector button {
             flex: 1;
             background-color: #383838 !important;
             border: 1px solid #ff7b25;
-            border-radius: 4px;
-            padding: 4px 0;
-            font-size: 0.65rem;
+            border-radius: 3px;
+            padding: 3px 0;
+            font-size: 0.6rem;
             color: #ff7b25;
             cursor: pointer;
-            margin: 0 2px;
+            margin: 0 1px;
             text-align: center;
         }
         .station-secondary .rain-selector button {
@@ -263,16 +277,15 @@
         }
         .forecast {
             background-color: #383838 !important;
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 5px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 5px;
             border-left: 5px solid #ff7b25;
         }
         .forecast h3 {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #ff7b25;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             text-align: center;
         }
         .forecast-days {
@@ -282,56 +295,96 @@
         .forecast-day {
             text-align: center;
             flex: 1;
-            padding: 0 3px;
+            padding: 0 2px;
         }
         .forecast-day .day {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #ff7b25;
             font-weight: bold;
         }
         .forecast-day .icon {
-            font-size: 1.5rem;
-            margin: 5px 0;
+            font-size: 1.2rem;
+            margin: 3px 0;
             color: #e0e0e0;
         }
         .forecast-day .temp-range {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #ff9e4a;
         }
         .forecast-day .precip-info {
-            font-size: 0.6rem;
-            margin-top: 3px;
+            font-size: 0.55rem;
+            margin-top: 2px;
         }
         .footer {
             text-align: center;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             color: #ff9e4a;
             font-style: italic;
             margin-top: auto;
-            padding-top: 10px;
+            padding-top: 5px;
+            position: sticky;
+            bottom: 0;
+            background: inherit;
+            z-index: 10;
         }
         .error {
             color: #ff6b6b;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             text-align: center;
-            margin-top: 5px;
+            margin-top: 3px;
             display: none;
         }
         .refresh-btn {
             background-color: #ff7b25;
             color: white;
             border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            margin-top: 5px;
+            border-radius: 3px;
+            padding: 4px 8px;
+            margin-top: 3px;
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
         }
         .forecast-update {
             text-align: center;
-            font-size: 0.7rem;
-            margin-bottom: 5px;
+            font-size: 0.6rem;
+            margin-bottom: 3px;
             color: #ff9e4a;
+        }
+        .scroll-indicator {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #ff9e4a;
+            margin: 5px 0;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-5px);}
+            60% {transform: translateY(-3px);}
+        }
+
+        /* Ajustes para pantallas pequeñas */
+        @media (max-height: 700px), (max-width: 400px) {
+            .station {
+                padding: 6px;
+            }
+            .temp-highlight {
+                font-size: 1.5rem;
+            }
+            .station-secondary .temp-highlight,
+            .station-tertiary .temp-highlight {
+                font-size: 1.3rem;
+            }
+            .wind-rose {
+                width: 45px;
+                height: 45px;
+            }
+            .compass-arrow {
+                border-bottom-width: 16px;
+            }
+            .station-name {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -343,122 +396,126 @@
             <button class="refresh-btn" id="refresh-btn">Actualizar Datos</button>
         </div>
 
-        <!-- Estación Reina Mora (Principal) -->
-        <div class="station station-primary">
-            <div class="station-name">Lomas del Cauquén (932 m.s.n.m)</div>
-            <div class="station-data">
-                <div class="data-column">
-                    <div class="temp-highlight" id="temp-principal">--°C</div>
-                </div>
-                <div class="data-column">
-                    <div class="wind-container">
-                        <div class="wind-rose">
-                            <div class="compass-circle">
-                                <div class="compass-arrow" id="wind-arrow-principal"></div>
-                                <div class="compass-direction" style="top: 2px; left: 50%; transform: translateX(-50%);">N</div>
-                                <div class="compass-direction" style="bottom: 2px; left: 50%; transform: translateX(-50%);">S</div>
-                                <div class="compass-direction" style="top: 50%; left: 2px; transform: translateY(-50%);">O</div>
-                                <div class="compass-direction" style="top: 50%; right: 2px; transform: translateY(-50%);">E</div>
+        <div class="stations-container">
+            <!-- Estación Reina Mora (Principal) -->
+            <div class="station station-primary">
+                <div class="station-name">Lomas del Cauquén (932 m.s.n.m)</div>
+                <div class="station-data">
+                    <div class="data-column">
+                        <div class="temp-highlight" id="temp-principal">--°C</div>
+                    </div>
+                    <div class="data-column">
+                        <div class="wind-container">
+                            <div class="wind-rose">
+                                <div class="compass-circle">
+                                    <div class="compass-arrow" id="wind-arrow-principal"></div>
+                                    <div class="compass-direction" style="top: 2px; left: 50%; transform: translateX(-50%);">N</div>
+                                    <div class="compass-direction" style="bottom: 2px; left: 50%; transform: translateX(-50%);">S</div>
+                                    <div class="compass-direction" style="top: 50%; left: 2px; transform: translateY(-50%);">O</div>
+                                    <div class="compass-direction" style="top: 50%; right: 2px; transform: translateY(-50%);">E</div>
+                                </div>
+                            </div>
+                            <div class="wind-speed" id="wind-speed-principal">-- km/h (--)</div>
+                            <div class="wind-gust" id="wind-gust-principal">Ráfagas: -- km/h</div>
+                        </div>
+                    </div>
+                    <div class="data-column">
+                        <div class="rain-container">
+                            <div class="rain-amount" id="rain-principal">
+                                <div>Lluvia 24h: -- mm</div>
+                                <div>Nieve: -- cm</div>
+                            </div>
+                            <div class="rain-selector">
+                                <button class="active" data-period="24h">24h</button>
+                                <button data-period="48h">48h</button>
+                                <button data-period="72h">72h</button>
                             </div>
                         </div>
-                        <div class="wind-speed" id="wind-speed-principal">-- km/h (--)</div>
-                        <div class="wind-gust" id="wind-gust-principal">Ráfagas: -- km/h</div>
                     </div>
                 </div>
-                <div class="data-column">
-                    <div class="rain-container">
-                        <div class="rain-amount" id="rain-principal">
-                            <div>Lluvia 24h: -- mm</div>
-                            <div>Nieve: -- cm</div>
-                        </div>
-                        <div class="rain-selector">
-                            <button class="active" data-period="24h">24h</button>
-                            <button data-period="48h">48h</button>
-                            <button data-period="72h">72h</button>
-                        </div>
-                    </div>
-                </div>
+                <div class="error" id="error-principal"></div>
             </div>
-            <div class="error" id="error-principal"></div>
+
+            <!-- Estación Cerro Catedral (Secundaria) -->
+            <div class="station station-secondary">
+                <div class="station-name">Base Villa Catedral (1070 m.s.n.m)</div>
+                <div class="station-data">
+                    <div class="data-column">
+                        <div class="temp-highlight" id="temp-secundaria">--°C</div>
+                    </div>
+                    <div class="data-column">
+                        <div class="wind-container">
+                            <div class="wind-rose">
+                                <div class="compass-circle">
+                                    <div class="compass-arrow" id="wind-arrow-secundaria"></div>
+                                    <div class="compass-direction" style="top: 2px; left: 50%; transform: translateX(-50%);">N</div>
+                                    <div class="compass-direction" style="bottom: 2px; left: 50%; transform: translateX(-50%);">S</div>
+                                    <div class="compass-direction" style="top: 50%; left: 2px; transform: translateY(-50%);">O</div>
+                                    <div class="compass-direction" style="top: 50%; right: 2px; transform: translateY(-50%);">E</div>
+                                </div>
+                            </div>
+                            <div class="wind-speed" id="wind-speed-secundaria">-- km/h (--)</div>
+                            <div class="wind-gust" id="wind-gust-secundaria">Ráfagas: -- km/h</div>
+                        </div>
+                    </div>
+                    <div class="data-column">
+                        <div class="rain-container">
+                            <div class="rain-amount" id="rain-secundaria">
+                                <div>Lluvia 24h: -- mm</div>
+                                <div>Nieve: -- cm</div>
+                            </div>
+                            <div class="rain-selector">
+                                <button class="active" data-period="24h">24h</button>
+                                <button data-period="48h">48h</button>
+                                <button data-period="72h">72h</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="error" id="error-secundaria"></div>
+            </div>
+
+            <!-- Estación Cerro Otto (Terciaria) -->
+            <div class="station station-tertiary">
+                <div class="station-name">Cerro Otto, ppg. (1422 m.s.n.m)</div>
+                <div class="station-data">
+                    <div class="data-column">
+                        <div class="temp-highlight" id="temp-terciaria">--°C</div>
+                    </div>
+                    <div class="data-column">
+                        <div class="wind-container">
+                            <div class="wind-rose">
+                                <div class="compass-circle">
+                                    <div class="compass-arrow" id="wind-arrow-terciaria"></div>
+                                    <div class="compass-direction" style="top: 2px; left: 50%; transform: translateX(-50%);">N</div>
+                                    <div class="compass-direction" style="bottom: 2px; left: 50%; transform: translateX(-50%);">S</div>
+                                    <div class="compass-direction" style="top: 50%; left: 2px; transform: translateY(-50%);">O</div>
+                                    <div class="compass-direction" style="top: 50%; right: 2px; transform: translateY(-50%);">E</div>
+                                </div>
+                            </div>
+                            <div class="wind-speed" id="wind-speed-terciaria">-- km/h (--)</div>
+                            <div class="wind-gust" id="wind-gust-terciaria">Ráfagas: -- km/h</div>
+                        </div>
+                    </div>
+                    <div class="data-column">
+                        <div class="rain-container">
+                            <div class="rain-amount" id="rain-terciaria">
+                                <div>Lluvia 24h: -- mm</div>
+                                <div>Nieve: -- cm</div>
+                            </div>
+                            <div class="rain-selector">
+                                <button class="active" data-period="24h">24h</button>
+                                <button data-period="48h">48h</button>
+                                <button data-period="72h">72h</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="error" id="error-terciaria"></div>
+            </div>
         </div>
 
-        <!-- Estación Cerro Catedral (Secundaria) -->
-        <div class="station station-secondary">
-            <div class="station-name">Base Cerro Catedral (1070 m.s.n.m)</div>
-            <div class="station-data">
-                <div class="data-column">
-                    <div class="temp-highlight" id="temp-secundaria">--°C</div>
-                </div>
-                <div class="data-column">
-                    <div class="wind-container">
-                        <div class="wind-rose">
-                            <div class="compass-circle">
-                                <div class="compass-arrow" id="wind-arrow-secundaria"></div>
-                                <div class="compass-direction" style="top: 2px; left: 50%; transform: translateX(-50%);">N</div>
-                                <div class="compass-direction" style="bottom: 2px; left: 50%; transform: translateX(-50%);">S</div>
-                                <div class="compass-direction" style="top: 50%; left: 2px; transform: translateY(-50%);">O</div>
-                                <div class="compass-direction" style="top: 50%; right: 2px; transform: translateY(-50%);">E</div>
-                            </div>
-                        </div>
-                        <div class="wind-speed" id="wind-speed-secundaria">-- km/h (--)</div>
-                        <div class="wind-gust" id="wind-gust-secundaria">Ráfagas: -- km/h</div>
-                    </div>
-                </div>
-                <div class="data-column">
-                    <div class="rain-container">
-                        <div class="rain-amount" id="rain-secundaria">
-                            <div>Lluvia 24h: -- mm</div>
-                            <div>Nieve: -- cm</div>
-                        </div>
-                        <div class="rain-selector">
-                            <button class="active" data-period="24h">24h</button>
-                            <button data-period="48h">48h</button>
-                            <button data-period="72h">72h</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="error" id="error-secundaria"></div>
-        </div>
-
-        <!-- Estación Cerro Otto (Terciaria) -->
-        <div class="station station-tertiary">
-            <div class="station-name">Cerro Otto, ppg. (1422 m.s.n.m)</div>
-            <div class="station-data">
-                <div class="data-column">
-                    <div class="temp-highlight" id="temp-terciaria">--°C</div>
-                </div>
-                <div class="data-column">
-                    <div class="wind-container">
-                        <div class="wind-rose">
-                            <div class="compass-circle">
-                                <div class="compass-arrow" id="wind-arrow-terciaria"></div>
-                                <div class="compass-direction" style="top: 2px; left: 50%; transform: translateX(-50%);">N</div>
-                                <div class="compass-direction" style="bottom: 2px; left: 50%; transform: translateX(-50%);">S</div>
-                                <div class="compass-direction" style="top: 50%; left: 2px; transform: translateY(-50%);">O</div>
-                                <div class="compass-direction" style="top: 50%; right: 2px; transform: translateY(-50%);">E</div>
-                            </div>
-                        </div>
-                        <div class="wind-speed" id="wind-speed-terciaria">-- km/h (--)</div>
-                        <div class="wind-gust" id="wind-gust-terciaria">Ráfagas: -- km/h</div>
-                    </div>
-                </div>
-                <div class="data-column">
-                    <div class="rain-container">
-                        <div class="rain-amount" id="rain-terciaria">
-                            <div>Lluvia 24h: -- mm</div>
-                            <div>Nieve: -- cm</div>
-                        </div>
-                        <div class="rain-selector">
-                            <button class="active" data-period="24h">24h</button>
-                            <button data-period="48h">48h</button>
-                            <button data-period="72h">72h</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="error" id="error-terciaria"></div>
-        </div>
+        <div class="scroll-indicator">▼ Pronóstico extendido ▼</div>
 
         <!-- Pronóstico Extendido -->
         <div class="forecast">
