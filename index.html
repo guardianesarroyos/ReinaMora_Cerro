@@ -134,11 +134,12 @@
         .station-data {
             display: flex;
             justify-content: space-between;
+            gap: 4px;
         }
         .data-column {
             flex: 1;
             min-width: 0;
-            padding: 0 3px;
+            padding: 0 2px;
         }
         .temp-highlight {
             font-size: 1.8rem;
@@ -146,6 +147,7 @@
             color: #ff7b25;
             line-height: 1;
             margin-bottom: 6px;
+            text-align: center;
         }
         .station-secondary .temp-highlight {
             font-size: 1.5rem;
@@ -167,6 +169,11 @@
             height: 55px;
             position: relative;
             margin: 3px 0;
+        }
+        .station-secondary .wind-rose,
+        .station-tertiary .wind-rose {
+            width: 50px;
+            height: 50px;
         }
         .compass-circle {
             width: 100%;
@@ -232,6 +239,7 @@
             color: #ff7b25;
             margin: 3px 0;
             text-align: center;
+            line-height: 1.2;
         }
         .station-secondary .rain-amount {
             color: #ff9e4a;
@@ -359,24 +367,32 @@
         }
         @media (max-height: 700px), (max-width: 400px) {
             .station {
-                padding: 6px;
+                padding: 5px;
             }
             .temp-highlight {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
             .station-secondary .temp-highlight,
             .station-tertiary .temp-highlight {
-                font-size: 1.3rem;
+                font-size: 1.2rem;
             }
             .wind-rose {
-                width: 45px;
-                height: 45px;
+                width: 40px;
+                height: 40px;
+                margin-left: -2px;
             }
             .compass-arrow {
-                border-bottom-width: 16px;
+                border-bottom-width: 14px;
             }
             .station-name {
                 font-size: 0.85rem;
+            }
+            .rain-amount {
+                font-size: 0.8rem;
+            }
+            .rain-selector button {
+                font-size: 0.55rem;
+                padding: 2px 0;
             }
         }
     </style>
@@ -415,7 +431,7 @@
                     <div class="data-column">
                         <div class="rain-container">
                             <div class="rain-amount" id="rain-principal">
-                                <div>Lluvia 24h: -- mm</div>
+                                <div>24h: -- mm</div>
                                 <div>Nieve: -- cm</div>
                             </div>
                             <div class="rain-selector">
@@ -454,7 +470,7 @@
                     <div class="data-column">
                         <div class="rain-container">
                             <div class="rain-amount" id="rain-secundaria">
-                                <div>Lluvia 24h: -- mm</div>
+                                <div>24h: -- mm</div>
                                 <div>Nieve: -- cm</div>
                             </div>
                             <div class="rain-selector">
@@ -493,7 +509,7 @@
                     <div class="data-column">
                         <div class="rain-container">
                             <div class="rain-amount" id="rain-terciaria">
-                                <div>Lluvia 24h: -- mm</div>
+                                <div>24h: -- mm</div>
                                 <div>Nieve: -- cm</div>
                             </div>
                             <div class="rain-selector">
@@ -531,9 +547,9 @@
                 elevacion: "932 m.s.n.m"
             },
             secundaria: {
-                id: "IBARIL12",  // Cambiado de IBARIL29 a IBARIL12
-                nombre: "Refugio Lynch",  // Nombre actualizado
-                elevacion: "1922 m.s.n.m"  // Elevación actualizada
+                id: "IBARIL12",
+                nombre: "Refugio Lynch",
+                elevacion: "1922 m.s.n.m"
             },
             terciaria: {
                 id: "IDEPAR138",
@@ -629,64 +645,83 @@
             }
 
             document.getElementById(`rain-${prefijo}`).innerHTML = `
-                <div>Lluvia 24h: ${datos.precipDaily} mm</div>
+                <div>24h: ${datos.precipDaily} mm</div>
                 <div>Nieve: ${datos.snowDepth} cm</div>
             `;
 
             document.getElementById('update-time').textContent = datos.obsTime;
         }
 
-        // Función para obtener icono del clima
-        function getWeatherIcon(iconCode) {
-            const icons = {
-                1: '☀️',  // Soleado
-                2: '⛅',  // Parcialmente nublado
-                3: '☁️',  // Nublado
-                4: '🌧️',  // Lluvia
-                5: '❄️',  // Nieve
-                6: '🌨️',  // Nieve/lluvia
-                7: '⛈️',  // Tormenta
-                8: '🌫️',  // Niebla
-                9: '🌬️'   // Viento
-            };
-            return icons[iconCode] || '🌤️';
-        }
-
-        // Función para cargar pronóstico
+        // Función para cargar pronóstico con Open-Meteo
         async function cargarPronostico() {
             try {
-                const response = await fetch(`https://api.weather.com/v3/wx/forecast/daily/5day?postalKey=8400:AR&language=es-AR&units=m&apiKey=6532d6454b8aa370768e63d6ba5a832e`);
-                
-                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-                
-                const data = await response.json();
-                if (!data.dayOfWeek || data.dayOfWeek.length === 0) {
-                    throw new Error("Datos de pronóstico incompletos");
-                }
+                const response = await fetch(
+                    "https://api.open-meteo.com/v1/forecast?latitude=-41.13&longitude=-71.30&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&forecast_days=5"
+                );
 
-                // Actualizar interfaz del pronóstico
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                const data = await response.json();
+
+                // Mapeamos los datos de Open-Meteo al formato esperado
+                const daysOfWeek = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
                 const forecastContainer = document.getElementById('forecast-container');
                 forecastContainer.innerHTML = '';
-                
+
                 for (let i = 0; i < 5; i++) {
-                    const day = document.createElement('div');
-                    day.className = 'forecast-day';
-                    day.innerHTML = `
-                        <div class="day">${data.dayOfWeek[i]}</div>
-                        <div class="icon">${getWeatherIcon(data.iconCode[i])}</div>
-                        <div class="temp-range">${data.temperatureMax[i]}°/${data.temperatureMin[i]}°</div>
-                        <div class="precip-info">${data.precipChance[i]}% | ${data.qpf[i]}mm</div>
+                    const date = new Date(data.daily.time[i]);
+                    const dayName = daysOfWeek[date.getDay()];
+                    const weatherIcon = getWeatherIcon(data.daily.weathercode[i]);
+                    const maxTemp = data.daily.temperature_2m_max[i].toFixed(0);
+                    const minTemp = data.daily.temperature_2m_min[i].toFixed(0);
+                    const precip = data.daily.precipitation_sum[i].toFixed(1);
+
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'forecast-day';
+                    dayElement.innerHTML = `
+                        <div class="day">${dayName}</div>
+                        <div class="icon">${weatherIcon}</div>
+                        <div class="temp-range">${maxTemp}°/${minTemp}°</div>
+                        <div class="precip-info">${precip} mm</div>
                     `;
-                    forecastContainer.appendChild(day);
+                    forecastContainer.appendChild(dayElement);
                 }
 
                 document.getElementById('forecast-update-time').textContent = new Date().toLocaleTimeString('es-AR');
-                
+
             } catch (error) {
-                console.error("Error en pronóstico:", error);
+                console.error("Error cargando pronóstico:", error);
                 document.getElementById('forecast-container').innerHTML = 
-                    '<div class="error" style="text-align:center;width:100%">Pronóstico no disponible temporalmente</div>';
+                    '<div class="error">Pronóstico no disponible. Actualiza la página.</div>';
             }
+        }
+
+        // Mapeo de códigos de clima de Open-Meteo a emojis
+        function getWeatherIcon(weatherCode) {
+            const icons = {
+                0: '☀️',   // Despejado
+                1: '🌤️',   // Mayormente despejado
+                2: '⛅',    // Parcialmente nublado
+                3: '☁️',    // Nublado
+                45: '🌫️',  // Niebla
+                51: '🌧️',  // Llovizna ligera
+                53: '🌧️',  // Llovizna moderada
+                55: '🌧️',  // Llovizna intensa
+                61: '🌧️',  // Lluvia ligera
+                63: '🌧️',  // Lluvia moderada
+                65: '🌧️',  // Lluvia intensa
+                71: '❄️',   // Nieve ligera
+                73: '❄️',   // Nieve moderada
+                75: '❄️',   // Nieve intensa
+                80: '🌧️',   // Chubascos ligeros
+                81: '🌧️',   // Chubascos moderados
+                82: '🌧️',   // Chubascos fuertes
+                85: '❄️',   // Nevada ligera
+                86: '❄️',   // Nevada intensa
+                95: '⛈️',   // Tormenta
+                96: '⛈️',   // Tormenta con granizo ligero
+                99: '⛈️'    // Tormenta con granizo intenso
+            };
+            return icons[weatherCode] || '🌤️';
         }
 
         // Función principal para actualizar datos
