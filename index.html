@@ -429,9 +429,9 @@
                 <div class="error" id="error-principal"></div>
             </div>
 
-            <!-- Estación Cerro Catedral (Secundaria) -->
+            <!-- Estación Refugio Lynch (Secundaria) -->
             <div class="station station-secondary">
-                <div class="station-name">Base Villa Catedral (1070 m.s.n.m)</div>
+                <div class="station-name">Refugio Lynch (1922 m.s.n.m)</div>
                 <div class="station-data">
                     <div class="data-column">
                         <div class="temp-highlight" id="temp-secundaria">--°C</div>
@@ -523,7 +523,7 @@
     </div>
 
     <script>
-        // Configuración de estaciones Wunderground
+        // Configuración de estaciones Wunderground (actualizada)
         const estaciones = {
             principal: {
                 id: "IDEPAR37",
@@ -531,9 +531,9 @@
                 elevacion: "932 m.s.n.m"
             },
             secundaria: {
-                id: "IBARIL29",
-                nombre: "Cerro Catedral",
-                elevacion: "1070 m.s.n.m"
+                id: "IBARIL12",  // Cambiado de IBARIL29 a IBARIL12
+                nombre: "Refugio Lynch",  // Nombre actualizado
+                elevacion: "1922 m.s.n.m"  // Elevación actualizada
             },
             terciaria: {
                 id: "IDEPAR138",
@@ -563,7 +563,6 @@
             try {
                 const response = await fetch(`https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=m&apiKey=6532d6454b8aa370768e63d6ba5a832e`);
                 
-                // Verificación EXTRA para respuestas vacías (solución para IBARIL29)
                 if (!response.ok) {
                     throw new Error(`Error HTTP: ${response.status}`);
                 }
@@ -637,22 +636,73 @@
             document.getElementById('update-time').textContent = datos.obsTime;
         }
 
-        // [Resto de las funciones (cargarPronostico, etc.) se mantienen igual]
-        // ... 
+        // Función para obtener icono del clima
+        function getWeatherIcon(iconCode) {
+            const icons = {
+                1: '☀️',  // Soleado
+                2: '⛅',  // Parcialmente nublado
+                3: '☁️',  // Nublado
+                4: '🌧️',  // Lluvia
+                5: '❄️',  // Nieve
+                6: '🌨️',  // Nieve/lluvia
+                7: '⛈️',  // Tormenta
+                8: '🌫️',  // Niebla
+                9: '🌬️'   // Viento
+            };
+            return icons[iconCode] || '🌤️';
+        }
+
+        // Función para cargar pronóstico
+        async function cargarPronostico() {
+            try {
+                const response = await fetch(`https://api.weather.com/v3/wx/forecast/daily/5day?postalKey=8400:AR&language=es-AR&units=m&apiKey=6532d6454b8aa370768e63d6ba5a832e`);
+                
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                
+                const data = await response.json();
+                if (!data.dayOfWeek || data.dayOfWeek.length === 0) {
+                    throw new Error("Datos de pronóstico incompletos");
+                }
+
+                // Actualizar interfaz del pronóstico
+                const forecastContainer = document.getElementById('forecast-container');
+                forecastContainer.innerHTML = '';
+                
+                for (let i = 0; i < 5; i++) {
+                    const day = document.createElement('div');
+                    day.className = 'forecast-day';
+                    day.innerHTML = `
+                        <div class="day">${data.dayOfWeek[i]}</div>
+                        <div class="icon">${getWeatherIcon(data.iconCode[i])}</div>
+                        <div class="temp-range">${data.temperatureMax[i]}°/${data.temperatureMin[i]}°</div>
+                        <div class="precip-info">${data.precipChance[i]}% | ${data.qpf[i]}mm</div>
+                    `;
+                    forecastContainer.appendChild(day);
+                }
+
+                document.getElementById('forecast-update-time').textContent = new Date().toLocaleTimeString('es-AR');
+                
+            } catch (error) {
+                console.error("Error en pronóstico:", error);
+                document.getElementById('forecast-container').innerHTML = 
+                    '<div class="error" style="text-align:center;width:100%">Pronóstico no disponible temporalmente</div>';
+            }
+        }
 
         // Función principal para actualizar datos
         async function actualizarDatos() {
             try {
                 document.getElementById('update-time').textContent = "Actualizando...";
                 
-                const datosPrincipal = await obtenerDatosWunderground(estaciones.principal.id);
-                actualizarEstacion(datosPrincipal, 'principal');
-
-                const datosSecundaria = await obtenerDatosWunderground(estaciones.secundaria.id);
-                actualizarEstacion(datosSecundaria, 'secundaria');
-
-                const datosTerciaria = await obtenerDatosWunderground(estaciones.terciaria.id);
-                actualizarEstacion(datosTerciaria, 'terciaria');
+                await Promise.all([
+                    obtenerDatosWunderground(estaciones.principal.id)
+                        .then(datos => actualizarEstacion(datos, 'principal')),
+                    obtenerDatosWunderground(estaciones.secundaria.id)
+                        .then(datos => actualizarEstacion(datos, 'secundaria')),
+                    obtenerDatosWunderground(estaciones.terciaria.id)
+                        .then(datos => actualizarEstacion(datos, 'terciaria')),
+                    cargarPronostico()
+                ]);
 
             } catch (error) {
                 console.error("Error general:", error);
@@ -665,7 +715,7 @@
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             actualizarDatos();
-            setInterval(actualizarDatos, 10 * 60 * 1000);
+            setInterval(actualizarDatos, 10 * 60 * 1000); // Actualizar cada 10 minutos
             document.getElementById('refresh-btn').addEventListener('click', actualizarDatos);
         });
     </script>
