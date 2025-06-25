@@ -32,6 +32,19 @@ Brindar a los **vecinos de la zona serrana** una herramienta confiable para cons
 - HTML, CSS y JavaScript
 - Alojamiento local o en servidor simple
 - (Opcionalmente puede integrarse con Dreamweaver para edición)
+## Configuración de la API Key de Wunderground
+
+Por motivos de seguridad, la clave de API de Wunderground **no está incluida en este repositorio**.
+
+Para que la aplicación funcione correctamente en tu entorno local, debes crear un archivo llamado `config.local.js` en la raíz del proyecto con el siguiente contenido:
+
+```js
+window.WU_API_KEY = "TU_API_KEY_AQUI";
+```
+Si no tienes una clave, solicita acceso al administrador del proyecto.
+
+---
+
 
 ## Público objetivo
 
