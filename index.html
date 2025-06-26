@@ -27,13 +27,14 @@
             flex-direction: column;
             background-image: url('reinamora_dia.png');
             background-size: cover;
-            background-position: center;
+            background-position: 85% center; /* <-- aquí el cambio */
             background-attachment: fixed;
             background-blend-mode: multiply;
         }
         @media (prefers-color-scheme: dark) {
             body {
                 background-image: url('reinamora_noche.png');
+                background-position: 65% center; /* <-- igual para la noche */
                 background-color: rgba(10, 10, 10, 0.7);
                 color: #e0e0e0;
             }
