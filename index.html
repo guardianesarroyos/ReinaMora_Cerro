@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <title>Monitor Meteo Cerros</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#ff7b25">
     <style>
         * {
             margin: 0;
@@ -20,7 +25,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background-image: url('reinamora_noche.png');
+            background-image: url('reinamora_dia.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -28,6 +33,7 @@
         }
         @media (prefers-color-scheme: dark) {
             body {
+                background-image: url('reinamora_noche.png');
                 background-color: rgba(10, 10, 10, 0.7);
                 color: #e0e0e0;
             }
