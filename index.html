@@ -67,7 +67,7 @@
             }
         }
         .app-container {
-            background: rgba(80, 80, 80, 0.85);
+            background: rgba(80, 80, 80, 0.2); /* antes 0.85 */
             border-radius: 12px;
             padding: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -113,17 +113,17 @@
             backdrop-filter: blur(2px);
         }
         .station-primary {
-            background-color: rgba(56, 56, 56, 0.9);
+            background-color: rgba(56, 56, 56, 0.18); /* antes 0.9 */
             border-left: 5px solid #ff7b25;
             flex-direction: column;
         }
         .station-secondary {
-            background-color: rgba(69, 69, 69, 0.9);
+            background-color: rgba(69, 69, 69, 0.15); /* antes 0.9 */
             border-left: 3px solid #ff9e4a;
             flex-direction: column;
         }
-        .station-tertiary {
-            background-color: rgba(69, 69, 69, 0.9);
+        .station-terciaria {
+            background-color: rgba(69, 69, 69, 0.15); /* antes 0.9 */
             border-left: 3px solid #4a90e2;
             flex-direction: column;
         }
@@ -136,7 +136,7 @@
         .station-secondary .station-name {
             color: #ff9e4a;
         }
-        .station-tertiary .station-name {
+        .station-terciaria .station-name {
             color: #4a90e2;
         }
         .station-data {
@@ -161,7 +161,7 @@
             font-size: 1.5rem;
             color: #ff9e4a;
         }
-        .station-tertiary .temp-highlight {
+        .station-terciaria .temp-highlight {
             font-size: 1.5rem;
             color: #4a90e2;
         }
@@ -291,7 +291,7 @@
             background-color: #4a90e2 !important;
         }
         .forecast {
-            background-color: rgba(56, 56, 56, 0.9) !important;
+            background-color: rgba(56, 56, 56, 0.13) !important; /* antes 0.9 */
             border-radius: 10px;
             padding: 6px 8px;
             margin-bottom: 3px;
@@ -411,7 +411,7 @@
         <div class="header">
             <h1>Monitor Meteo Cerros</h1>
             <p>Bariloche, Argentina</p>
-            <button class="refresh-btn" id="refresh-btn">Actualizar Datos</button>
+            <!-- <button class="refresh-btn" id="refresh-btn">Actualizar Datos</button> -->
         </div>
 
         <div class="stations-container">
@@ -548,18 +548,32 @@
     </div>
 
     <script>
-      // Intenta cargar config.local.js, si falla carga config.js
-      (function() {
-        var script = document.createElement('script');
-        script.src = 'config.local.js';
-        script.onerror = function() {
-          var fallback = document.createElement('script');
-          fallback.src = 'config.js';
-          document.head.appendChild(fallback);
-        };
-        document.head.appendChild(script);
-      })();
-    </script>
+(function() {
+  function iniciarApp() {
+    actualizarDatos();
+    setInterval(actualizarDatos, 10 * 60 * 1000); // Actualizar cada 10 minutos
+  }
+
+  function checkConfigLoaded() {
+    if (window.APP_CONFIG && window.APP_CONFIG.wundergroundApiKey) {
+      iniciarApp();
+    } else {
+      setTimeout(checkConfigLoaded, 50);
+    }
+  }
+
+  var script = document.createElement('script');
+  script.src = 'config.local.js';
+  script.onerror = function() {
+    var fallback = document.createElement('script');
+    fallback.src = 'config.js';
+    fallback.onload = checkConfigLoaded;
+    document.head.appendChild(fallback);
+  };
+  script.onload = checkConfigLoaded;
+  document.head.appendChild(script);
+})();
+</script>
     <script>
         // Renombra este archivo a config.local.js y coloca tu API key real
 
@@ -776,8 +790,7 @@
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             actualizarDatos();
-            setInterval(actualizarDatos, 10 * 60 * 1000); // Actualizar cada 10 minutos
-            document.getElementById('refresh-btn').addEventListener('click', actualizarDatos);
+            setInterval(actualizarDatos, 10 * 60 * 1000);
         });
     </script>
 </body>
