@@ -10,6 +10,9 @@
     <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
     <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="theme-color" content="#ff7b25">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <style>
         * {
             margin: 0;
@@ -587,7 +590,7 @@
         <div class="footer">Creado por guardianesarroyosba © 🇦🇷 | Actualizado: <span id="update-time">--:--</span></div>
     </div>
 
-    <script src="config.js"></script>
+    <script src="config.js?v=1.0.0"></script>
     <script>
         // Renombra este archivo a config.local.js y coloca tu API key real
 
@@ -787,25 +790,25 @@
 
         // Función principal para actualizar datos
         async function actualizarDatos() {
-            try {
-                document.getElementById('update-time').textContent = "Actualizando...";
-                
-                await Promise.all([
-                    obtenerDatosWunderground(estaciones.principal.id)
-                        .then(datos => actualizarEstacion(datos, 'principal')),
-                    obtenerDatosWunderground(estaciones.secundaria.id)
-                        .then(datos => actualizarEstacion(datos, 'secundaria')),
-                    obtenerDatosWunderground(estaciones.terciaria.id)
-                        .then(datos => actualizarEstacion(datos, 'terciaria')),
-                    cargarPronostico()
-                ]);
+            document.getElementById('update-time').textContent = "Actualizando...";
 
-            } catch (error) {
-                console.error("Error general:", error);
-                mostrarError("Error al actualizar datos", 'principal');
-                mostrarError("Error al actualizar datos", 'secundaria');
-                mostrarError("Error al actualizar datos", 'terciaria');
-            }
+            // Actualiza cada estación por separado
+            await Promise.all([
+                obtenerDatosWunderground(estaciones.principal.id)
+                    .then(datos => actualizarEstacion(datos, 'principal'))
+                    .catch(error => mostrarError("Error al actualizar datos", 'principal')),
+                obtenerDatosWunderground(estaciones.secundaria.id)
+                    .then(datos => actualizarEstacion(datos, 'secundaria'))
+                    .catch(error => mostrarError("Error al actualizar datos", 'secundaria')),
+                obtenerDatosWunderground(estaciones.terciaria.id)
+                    .then(datos => actualizarEstacion(datos, 'terciaria'))
+                    .catch(error => mostrarError("Error al actualizar datos", 'terciaria')),
+                cargarPronostico().catch(error => {
+                    console.error("Error cargando pronóstico:", error);
+                    document.getElementById('forecast-container').innerHTML = 
+                        '<div class="error">Pronóstico no disponible. Actualiza la página.</div>';
+                })
+            ]);
         }
 
         // Inicialización
