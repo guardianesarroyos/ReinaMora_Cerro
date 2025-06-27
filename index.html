@@ -653,19 +653,35 @@
                 const obs = data.observations[0];
                 const metric = obs.metric || {};
 
-                // Manejo de precipitación
+                // Si al menos hay temperatura, no marcamos error general
+                const temp = (metric.temp !== undefined) ? metric.temp.toFixed(1) : '--';
+                const windSpeed = (metric.windSpeed !== undefined) ? metric.windSpeed.toFixed(1) : '--';
+                const windGust = (metric.windGust !== undefined) ? metric.windGust.toFixed(1) : '--';
+                const windDir = obs.winddir || '--';
                 let precipDiaria = (metric.precipTotal24h !== undefined) ? metric.precipTotal24h : 
                                  (metric.precipDaily !== undefined) ? metric.precipDaily : 0;
-                
+                const snowDepth = (metric.snowDepth !== undefined) ? metric.snowDepth.toFixed(1) : '0.0';
+                const obsTime = obs.obsTimeLocal || new Date().toLocaleTimeString('es-AR');
+
+                // Solo marcar error si TODOS los datos principales están ausentes
+                const datosPrincipalesFaltan = (
+                    temp === '--' &&
+                    windSpeed === '--' &&
+                    windGust === '--' &&
+                    windDir === '--' &&
+                    precipDiaria === 0 &&
+                    snowDepth === '0.0'
+                );
+
                 return {
-                    temp: (metric.temp !== undefined) ? metric.temp.toFixed(1) : '--',
-                    windSpeed: (metric.windSpeed !== undefined) ? metric.windSpeed.toFixed(1) : '--',
-                    windGust: (metric.windGust !== undefined) ? metric.windGust.toFixed(1) : '--',
-                    windDir: obs.winddir || '--',
+                    temp,
+                    windSpeed,
+                    windGust,
+                    windDir,
                     precipDaily: precipDiaria.toFixed(1),
-                    snowDepth: (metric.snowDepth !== undefined) ? metric.snowDepth.toFixed(1) : '0.0',
-                    obsTime: obs.obsTimeLocal || new Date().toLocaleTimeString('es-AR'),
-                    error: false
+                    snowDepth,
+                    obsTime,
+                    error: datosPrincipalesFaltan
                 };
 
             } catch (error) {
