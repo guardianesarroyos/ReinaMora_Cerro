@@ -73,6 +73,33 @@
                 color: #000 !important;
             }
         }
+        @media (prefers-color-scheme: light) {
+            body {
+                color: #222 !important;
+            }
+            .station-primary, .station-secondary, .station-terciaria, .forecast {
+                color: #222 !important;
+                background-color: transparent !important;
+            }
+            .station-name {
+                color: #222 !important;
+            }
+            .temp-highlight, .rain-amount, .wind-speed, .wind-gust {
+                color: #222 !important;
+            }
+            .forecast h3,
+            .forecast-day .day {
+                color: #222 !important;
+            }
+            .rain-selector button {
+                color: #222 !important;
+                border-color: #ff7b25;
+            }
+            .rain-selector button.active {
+                background-color: #ff7b25 !important;
+                color: #fff !important;
+            }
+        }
         .app-container {
             background: transparent !important;
             border-radius: 12px;
