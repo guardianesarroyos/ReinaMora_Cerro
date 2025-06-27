@@ -27,7 +27,7 @@
             flex-direction: column;
             background-image: url('reinamora_dia.png');
             background-size: cover;
-            background-position: 96% center;
+            background-position: 96% center; /* <-- aquí el cambio */
             background-attachment: fixed;
             background-blend-mode: multiply;
         }
@@ -78,10 +78,10 @@
                 color: #696969 !important;
             }
             .header p {
-                color: #da5c09 !important;
-            }
+        color: #da5c09 !important; /* o el color que prefieras para el día */
+    }
             .station-primary, .station-secondary, .station-terciaria, .forecast {
-                background-color: rgba(255,255,255,0.35) !important;
+                background-color: rgba(255,255,255,0.35) !important; /* Blanco translúcido */
                 color: #222 !important;
             }
             .station-name {
@@ -148,17 +148,17 @@
             backdrop-filter: blur(1px);
         }
         .station-primary {
-            background-color: rgba(56, 56, 56, 0.18);
+            background-color: rgba(56, 56, 56, 0.18); /* antes 0.9 */
             border-left: 5px solid #ff7b25;
             flex-direction: column;
         }
         .station-secondary {
-            background-color: rgba(69, 69, 69, 0.15);
+            background-color: rgba(69, 69, 69, 0.15); /* antes 0.9 */
             border-left: 3px solid #ff9e4a;
             flex-direction: column;
         }
         .station-terciaria {
-            background-color: rgba(69, 69, 69, 0.15);
+            background-color: rgba(69, 69, 69, 0.15); /* antes 0.9 */
             border-left: 3px solid #4a90e2;
             flex-direction: column;
         }
@@ -326,7 +326,7 @@
             background-color: #4a90e2 !important;
         }
         .forecast {
-            background-color: rgba(56, 56, 56, 0.13) !important;
+            background-color: rgba(56, 56, 56, 0.13) !important; /* antes 0.9 */
             border-radius: 10px;
             padding: 6px 8px;
             margin-bottom: 3px;
@@ -439,11 +439,11 @@
             }
         }
         @media (max-width: 600px) {
-            body {
-                background-position: 80% center;
-                background-size: cover;
-            }
-        }
+    body {
+        background-position: 80% center; /* aún más a la derecha en móviles */
+        background-size: cover; /* o prueba con 110% auto para ver más imagen */
+    }
+}
     </style>
 </head>
 <body>
@@ -451,10 +451,11 @@
         <div class="header">
             <h1>Monitor Meteo Cerros</h1>
             <p>Bariloche, Argentina</p>
+            <!-- <button class="refresh-btn" id="refresh-btn">Actualizar Datos</button> -->
         </div>
 
         <div class="stations-container">
-            <!-- Estación Refugio Lynch -->
+            <!-- Estación Refugio Lynch (ahora primaria) -->
             <div class="station station-primary">
                 <div class="station-name">Refugio Lynch (1922 m.s.n.m)</div>
                 <div class="station-data">
@@ -493,7 +494,7 @@
                 <div class="error" id="error-principal"></div>
             </div>
 
-            <!-- Estación Cerro Otto -->
+            <!-- Estación Cerro Otto (ahora secundaria) -->
             <div class="station station-secondary">
                 <div class="station-name">Cerro Otto, ppg. (1422 m.s.n.m)</div>
                 <div class="station-data">
@@ -532,7 +533,7 @@
                 <div class="error" id="error-secundaria"></div>
             </div>
 
-            <!-- Estación Lomas del Cauquén -->
+            <!-- Estación Lomas del Cauquén (terciaria, igual) -->
             <div class="station station-terciaria">
                 <div class="station-name">Lomas del Cauquén (932 m.s.n.m)</div>
                 <div class="station-data">
@@ -587,7 +588,36 @@
     </div>
 
     <script>
-        // Configuración de estaciones
+(function() {
+  function iniciarApp() {
+    actualizarDatos();
+    setInterval(actualizarDatos, 10 * 60 * 1000); // Actualizar cada 10 minutos
+  }
+
+  function checkConfigLoaded() {
+    if (window.APP_CONFIG && window.APP_CONFIG.wundergroundApiKey) {
+      iniciarApp();
+    } else {
+      setTimeout(checkConfigLoaded, 50);
+    }
+  }
+
+  var script = document.createElement('script');
+  script.src = 'config.local.js';
+  script.onerror = function() {
+    var fallback = document.createElement('script');
+    fallback.src = 'config.js';
+    fallback.onload = checkConfigLoaded;
+    document.head.appendChild(fallback);
+  };
+  script.onload = checkConfigLoaded;
+  document.head.appendChild(script);
+})();
+</script>
+    <script>
+        // Renombra este archivo a config.local.js y coloca tu API key real
+
+        // Configuración de estaciones Wunderground (actualizada)
         const estaciones = {
             principal: {
                 id: "IBARIL12", // Refugio Lynch
@@ -606,14 +636,6 @@
             }
         };
 
-        // Contador de intentos fallidos por estación
-        const fallasPorEstacion = {
-            principal: 0,
-            secundaria: 0,
-            terciaria: 0
-        };
-        const MAX_INTENTOS_FALLIDOS = 2;
-
         // Función para obtener dirección del viento en texto
         function getWindDirection(degrees) {
             if (degrees === null || degrees === undefined) return '--';
@@ -630,7 +652,7 @@
             errorElement.style.display = 'block';
         }
 
-        // Función para obtener datos de Wunderground
+        // Función mejorada para obtener datos de Wunderground
         async function obtenerDatosWunderground(stationId) {
             try {
                 const apiKey = window.APP_CONFIG && window.APP_CONFIG.wundergroundApiKey;
@@ -666,8 +688,7 @@
                     precipDaily: precipDiaria.toFixed(1),
                     snowDepth: (metric.snowDepth !== undefined) ? metric.snowDepth.toFixed(1) : '0.0',
                     obsTime: obs.obsTimeLocal || new Date().toLocaleTimeString('es-AR'),
-                    error: false,
-                    source: "wunderground"
+                    error: false
                 };
 
             } catch (error) {
@@ -681,105 +702,7 @@
                     windDir: '--',
                     precipDaily: '--',
                     snowDepth: '--',
-                    obsTime: '--:--',
-                    source: "wunderground"
-                };
-            }
-        }
-
-        // Función para obtener datos de Open-Meteo como backup
-        async function obtenerDatosOpenMeteo() {
-            try {
-                const response = await fetch(
-                    "https://api.open-meteo.com/v1/forecast?latitude=-41.13&longitude=-71.30&current=temperature_2m,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=precipitation&timezone=auto"
-                );
-                
-                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-                const data = await response.json();
-                
-                // Obtenemos la temperatura base de Bariloche ciudad
-                const tempBariloche = data.current.temperature_2m;
-                
-                return {
-                    principal: {
-                        temp: (tempBariloche - 9).toFixed(1), // Refugio Lynch: -9°C
-                        windSpeed: data.current.wind_speed_10m.toFixed(1),
-                        windGust: data.current.wind_gusts_10m.toFixed(1),
-                        windDir: data.current.wind_direction_10m,
-                        precipDaily: "0.0",
-                        snowDepth: "0.0",
-                        obsTime: new Date().toLocaleTimeString('es-AR'),
-                        source: "openmeteo"
-                    },
-                    secundaria: {
-                        temp: (tempBariloche - 6).toFixed(1), // Cerro Otto: -6°C
-                        windSpeed: data.current.wind_speed_10m.toFixed(1),
-                        windGust: data.current.wind_gusts_10m.toFixed(1),
-                        windDir: data.current.wind_direction_10m,
-                        precipDaily: "0.0",
-                        snowDepth: "0.0",
-                        obsTime: new Date().toLocaleTimeString('es-AR'),
-                        source: "openmeteo"
-                    },
-                    terciaria: {
-                        temp: (tempBariloche - 2).toFixed(1), // Lomas del Cauquén: -2°C
-                        windSpeed: data.current.wind_speed_10m.toFixed(1),
-                        windGust: data.current.wind_gusts_10m.toFixed(1),
-                        windDir: data.current.wind_direction_10m,
-                        precipDaily: "0.0",
-                        snowDepth: "0.0",
-                        obsTime: new Date().toLocaleTimeString('es-AR'),
-                        source: "openmeteo"
-                    }
-                };
-            } catch (error) {
-                console.error("Error obteniendo datos de Open-Meteo:", error);
-                return null;
-            }
-        }
-
-        // Función para obtener datos con sistema de backup
-        async function obtenerDatosConBackup(stationId, prefijo) {
-            // Si ya superamos el máximo de intentos fallidos, usar Open-Meteo
-            if (fallasPorEstacion[prefijo] >= MAX_INTENTOS_FALLIDOS) {
-                console.log(`Usando Open-Meteo como backup para ${prefijo} (intentos fallidos: ${fallasPorEstacion[prefijo]})`);
-                const datosOpenMeteo = await obtenerDatosOpenMeteo();
-                if (datosOpenMeteo) {
-                    return datosOpenMeteo[prefijo];
-                }
-            }
-            
-            // Intentar con Wunderground primero
-            try {
-                const datos = await obtenerDatosWunderground(stationId);
-                if (datos.error) throw new Error(datos.message);
-                
-                // Resetear contador si tuvo éxito
-                fallasPorEstacion[prefijo] = 0;
-                return datos;
-            } catch (error) {
-                console.error(`Error con Wunderground para ${prefijo}:`, error.message);
-                fallasPorEstacion[prefijo]++;
-                
-                // Si superamos el máximo de intentos, probar con Open-Meteo
-                if (fallasPorEstacion[prefijo] >= MAX_INTENTOS_FALLIDOS) {
-                    const datosOpenMeteo = await obtenerDatosOpenMeteo();
-                    if (datosOpenMeteo) {
-                        return datosOpenMeteo[prefijo];
-                    }
-                }
-                
-                return { 
-                    error: true,
-                    message: `Datos temporalmente no disponibles (${stationId})`,
-                    temp: '--',
-                    windSpeed: '--',
-                    windGust: '--',
-                    windDir: '--',
-                    precipDaily: '--',
-                    snowDepth: '--',
-                    obsTime: '--:--',
-                    source: "wunderground"
+                    obsTime: '--:--'
                 };
             }
         }
@@ -790,12 +713,6 @@
                 mostrarError(datos.message, prefijo);
             } else {
                 document.getElementById(`error-${prefijo}`).style.display = 'none';
-                
-                // Indicar si estamos usando datos de backup
-                if (datos.source === "openmeteo") {
-                    mostrarError(`Datos estimados (Open-Meteo)`, prefijo);
-                    document.getElementById(`error-${prefijo}`).style.color = "#ff9e4a";
-                }
             }
 
             document.getElementById(`temp-${prefijo}`).textContent = `${datos.temp}°C`;
@@ -812,11 +729,12 @@
                 <div>Nieve: ${datos.snowDepth} cm</div>
             `;
 
-            // Cambiar estilo según la fuente de datos
-            const circle = document.querySelector(`.station-${prefijo} .compass-circle`);
-            circle.style.borderColor = datos.source === "openmeteo" ? "#4a90e2" : 
-                                     (datos.windSpeed > 40) ? "#e74c3c" : 
-                                     (datos.windSpeed > 20) ? "#f1c40f" : "#ff7b25";
+            // Cambia el color del círculo según la velocidad del viento
+            let color = "#ff7b25"; // color por defecto
+            if (datos.windSpeed > 40) color = "#e74c3c"; // rojo si viento fuerte
+            else if (datos.windSpeed > 20) color = "#f1c40f"; // amarillo si viento moderado
+
+            document.querySelector(`.station-${prefijo} .compass-circle`).style.borderColor = color;
 
             document.getElementById('update-time').textContent = datos.obsTime;
         }
@@ -899,11 +817,11 @@
                 document.getElementById('update-time').textContent = "Actualizando...";
                 
                 await Promise.all([
-                    obtenerDatosConBackup(estaciones.principal.id, 'principal')
+                    obtenerDatosWunderground(estaciones.principal.id)
                         .then(datos => actualizarEstacion(datos, 'principal')),
-                    obtenerDatosConBackup(estaciones.secundaria.id, 'secundaria')
+                    obtenerDatosWunderground(estaciones.secundaria.id)
                         .then(datos => actualizarEstacion(datos, 'secundaria')),
-                    obtenerDatosConBackup(estaciones.terciaria.id, 'terciaria')
+                    obtenerDatosWunderground(estaciones.terciaria.id)
                         .then(datos => actualizarEstacion(datos, 'terciaria')),
                     cargarPronostico()
                 ]);
@@ -919,7 +837,7 @@
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             actualizarDatos();
-            setInterval(actualizarDatos, 10 * 60 * 1000); // Actualizar cada 10 minutos
+            setInterval(actualizarDatos, 10 * 60 * 1000);
         });
     </script>
 </body>
