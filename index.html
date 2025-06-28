@@ -815,7 +815,7 @@
                     .catch(error => actualizarEstaciones(datos, 'principal')),
                 obtenerDatosWunderground(estaciones.secundaria.id)
                     .then(datos => actualizarEstacion(datos, 'secundaria'))
-                    .catch(error => mostrarError("Error al actualizar datos", 'secundaria')),
+                    .catch(error => mostrar("actualizar datos", 'secundaria')),
                 obtenerDatosWunderground(estaciones.terciaria.id)
                     .then(datos => actualizarEstacion(datos, 'terciaria'))
                     .catch(error => mostrarError("Error al actualizar datos", 'terciaria')),
