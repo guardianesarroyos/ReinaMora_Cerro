@@ -30,7 +30,7 @@
             flex-direction: column;
             background-image: url('reinamora_dia.png');
             background-size: cover;
-            background-position: 96% center; /* <-- aquí el cambio */
+            background-position: 96% center;
             background-attachment: fixed;
             background-blend-mode: multiply;
         }
@@ -55,7 +55,7 @@
                 background-color: transparent !important;
                 border-left: 3px solid #ff7b25 !important;
             }
-            .station-terciary {
+            .station-terciaria {
                 background-color: transparent !important;
                 border-left: 3px solid #4a90e2 !important;
             }
@@ -151,17 +151,17 @@
             backdrop-filter: blur(1px);
         }
         .station-primary {
-            background-color: rgba(56, 56, 56, 0.18); /* antes 0.9 */
+            background-color: rgba(56, 56, 56, 0.18);
             border-left: 5px solid #ff7b25;
             flex-direction: column;
         }
         .station-secondary {
-            background-color: rgba(69, 69, 69, 0.15); /* antes 0.9 */
+            background-color: rgba(69, 69, 69, 0.15);
             border-left: 3px solid #ff9e4a;
             flex-direction: column;
         }
         .station-terciaria {
-            background-color: rgba(69, 69, 69, 0.15); /* antes 0.9 */
+            background-color: rgba(69, 69, 69, 0.15);
             border-left: 3px solid #4a90e2;
             flex-direction: column;
         }
@@ -329,7 +329,7 @@
             background-color: #4a90e2 !important;
         }
         .forecast {
-            background-color: rgba(56, 56, 56, 0.13) !important; /* antes 0.9 */
+            background-color: rgba(56, 56, 56, 0.13) !important;
             border-radius: 10px;
             padding: 6px 8px;
             margin-bottom: 3px;
@@ -443,8 +443,8 @@
         }
         @media (max-width: 600px) {
     body {
-        background-position: 80% center; /* aún más a la derecha en móviles */
-        background-size: cover; /* o prueba con 110% auto para ver más imagen */
+        background-position: 80% center;
+        background-size: cover;
     }
 }
     </style>
@@ -457,7 +457,7 @@
             </div>
 
         <div class="stations-container">
-            <div class="station station-principal">
+            <div class="station station-primary">
                 <div class="station-name">Cerro Otto, ppg. (1422 m.s.n.m)</div>
                 <div class="station-data">
                     <div class="data-column">
@@ -657,8 +657,8 @@
                 const snowDepth = (metric.snowDepth !== undefined) ? metric.snowDepth.toFixed(1) : '0.0';
                 const obsTime = obs.obsTimeLocal || new Date().toLocaleTimeString('es-AR');
 
-                // Solo marcar error si TODOS los datos principales están ausentes
-                const datosPrincipalesFaltan = (
+                // Lógica para determinar si los datos principales faltan
+                let datosPrincipalesFaltan = (
                     temp === '--' &&
                     windSpeed === '--' &&
                     windGust === '--' &&
@@ -666,6 +666,15 @@
                     precipDiaria === 0 &&
                     snowDepth === '0.0'
                 );
+
+                // EXCEPCIÓN para Villa Catedral (IBARIL29): No considerar viento para el error general
+                if (stationId === "IBARIL29") {
+                    datosPrincipalesFaltan = (
+                        temp === '--' &&
+                        precipDiaria === 0 &&
+                        snowDepth === '0.0'
+                    );
+                }
 
                 return {
                     temp,
