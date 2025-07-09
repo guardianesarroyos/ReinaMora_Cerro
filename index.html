@@ -584,9 +584,7 @@
 
     <script src="config.js"></script>
     <script>
-        // Renombra este archivo a config.local.js y coloca tu API key real
-
-        // Configuración de estaciones Wunderground (actualizada)
+                // Configuración de estaciones Wunderground (actualizada)
         const estaciones = {
     primary: { // ¡Cambia 'primary' a 'primary'!
        id: "IDEPAR138", // Cerro Otto
@@ -714,7 +712,7 @@
                 if (datos.windDir !== null && typeof datos.windDir === 'number' && !isNaN(datos.windDir)) {
                     windArrow.style.transform = `translateX(-50%) rotate(${datos.windDir}deg)`;
                 } else {
-                    windArrow.style.transform = `translateX(-50%) rotate(0deg)`; // Valor por defecto o reinicio
+                    windArrow..transform = `translateX(-50%) rotate(0deg)`; // Valor por defecto o reinicio
                 }
 
                 // Mostrar precipitación y nieve, manejando nulls para la visualización
@@ -844,7 +842,7 @@ async function actualizarDatos() {
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             actualizarDatos();
-            setInterval(actualizarDatos, 10 * 60 * 1000);
+            setInterval(actualizarDatos, 15 * 60 * 1000);
         });
     </script>
 </body>
