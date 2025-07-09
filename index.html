@@ -458,31 +458,31 @@
         </div>
 
         <div class="stations-container">
-            <!-- Estación Refugio Lynch (ahora primaria) -->
-            <div class="station station-primary">
-                <div class="station-name">Refugio Lynch (1922 m.s.n.m)</div>
+            <!-- Estación más alt primaria) -->
+            <div class="station station-secondary">
+                <div class="station-name">Cerro Otto, ppg. (1422 m.s.n.m)</div>
                 <div class="station-data">
                     <div class="data-column">
-                        <div class="temp-highlight" id="temp-principal">--°C</div>
+                        <div class="temp-highlight" id="temp-secundaria">--°C</div>
                     </div>
                     <div class="data-column">
                         <div class="wind-container">
                             <div class="wind-rose">
                                 <div class="compass-circle">
-                                    <div class="compass-arrow" id="wind-arrow-principal"></div>
+                                    <div class="compass-arrow" id="wind-arrow-secundaria"></div>
                                     <div class="compass-direction" style="top: 2px; left: 50%; transform: translateX(-50%);">N</div>
                                     <div class="compass-direction" style="bottom: 2px; left: 50%; transform: translateX(-50%);">S</div>
                                     <div class="compass-direction" style="top: 50%; left: 2px; transform: translateY(-50%);">O</div>
                                     <div class="compass-direction" style="top: 50%; right: 2px; transform: translateY(-50%);">E</div>
                                 </div>
                             </div>
-                            <div class="wind-speed" id="wind-speed-principal">-- km/h (--)</div>
-                            <div class="wind-gust" id="wind-gust-principal">Ráfagas: -- km/h</div>
+                            <div class="wind-speed" id="wind-speed-secundaria">-- km/h (--)</div>
+                            <div class="wind-gust" id="wind-gust-secundaria">Ráfagas: -- km/h</div>
                         </div>
                     </div>
                     <div class="data-column">
                         <div class="rain-container">
-                            <div class="rain-amount" id="rain-principal">
+                            <div class="rain-amount" id="rain-secundaria">
                                 <div>Lluvias: -- mm</div>
                                 <div>Nieve: -- cm</div>
                             </div>
@@ -494,12 +494,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="error" id="error-principal"></div>
+                <div class="error" id="error-secundaria"></div>
             </div>
 
-            <!-- Estación Cerro Otto (ahora secundaria) -->
+            <!-- Estación Media -->
             <div class="station station-secondary">
-                <div class="station-name">Cerro Otto, ppg. (1422 m.s.n.m)</div>
+                <div class="station-name">Villa Catedral (1070 m.s.n.m)</div>
                 <div class="station-data">
                     <div class="data-column">
                         <div class="temp-highlight" id="temp-secundaria">--°C</div>
@@ -597,14 +597,14 @@
         // Configuración de estaciones Wunderground (actualizada)
         const estaciones = {
             principal: {
-                id: "IBARIL12", // Refugio Lynch
-                nombre: "Refugio Lynch",
-                elevacion: "1922 m.s.n.m"
-            },
-            secundaria: {
-                id: "IDEPAR138", // Cerro Otto
+               id: "IDEPAR138", // Cerro Otto
                 nombre: "Cerro Otto, ppg.",
-                elevacion: "1422 m.s.n.m"
+                elevacion: "1422 m.s.n.m"                        
+            },            
+                        secundaria: {
+                id: "IBARIL29", // Cerro Catedral
+                nombre: "Villa Catedral",
+                elevacion: "1070 m.s.n.m"
             },
             terciaria: {
                 id: "IDEPAR37", // Lomas del Cauquén
