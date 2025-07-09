@@ -595,7 +595,7 @@
                 nombre: "Cerro Otto, ppg.",
                 elevacion: "1422 m.s.n.m"                        
             },            
-                        secundaria: {
+            secundaria: {
                 id: "IBARIL29", // Villa Catedral
                 nombre: "Villa Catedral",
                 elevacion: "1070 m.s.n.m"
@@ -647,44 +647,36 @@
                 const obs = data.observations[0];
                 const metric = obs.metric || {};
 
-                // Si al menos hay temperatura, no marcamos error general
-                const temp = (metric.temp !== undefined) ? metric.temp.toFixed(1) : '--';
-                const windSpeed = (metric.windSpeed !== undefined) ? metric.windSpeed.toFixed(1) : '--';
-                const windGust = (metric.windGust !== undefined) ? metric.windGust.toFixed(1) : '--';
-                const windDir = obs.winddir || '--';
-                let precipDiaria = (metric.precipTotal24h !== undefined) ? metric.precipTotal24h : 
-                                 (metric.precipDaily !== undefined) ? metric.precipDaily : 0;
-                const snowDepth = (metric.snowDepth !== undefined) ? metric.snowDepth.toFixed(1) : '0.0';
+                // Preparar los valores, convirtiendo null/undefined a '--' o 0 según corresponda
+                const temp = (metric.temp !== undefined && metric.temp !== null) ? metric.temp.toFixed(1) : '--';
+                const windSpeed = (metric.windSpeed !== undefined && metric.windSpeed !== null) ? metric.windSpeed.toFixed(1) : '--';
+                const windGust = (metric.windGust !== undefined && metric.windGust !== null) ? metric.windGust.toFixed(1) : '--';
+                const windDir = (obs.winddir !== undefined && obs.winddir !== null) ? obs.winddir : '--';
+                
+                // Convertir precipDiaria y snowDepth a números o 0 si no son válidos, para una mejor comprobación.
+                const actualPrecipDaily = (metric.precipTotal24h !== undefined && metric.precipTotal24h !== null) ? metric.precipTotal24h : 
+                                         (metric.precipDaily !== undefined && metric.precipDaily !== null) ? metric.precipDaily : 0;
+                const actualSnowDepth = (metric.snowDepth !== undefined && metric.snowDepth !== null) ? metric.snowDepth : 0;
+                
                 const obsTime = obs.obsTimeLocal || new Date().toLocaleTimeString('es-AR');
 
-                // Lógica para determinar si los datos principales faltan
-                let datosPrincipalesFaltan = (
-                    temp === '--' &&
-                    windSpeed === '--' &&
-                    windGust === '--' &&
-                    windDir === '--' &&
-                    precipDiaria === 0 &&
-                    snowDepth === '0.0'
+                // Definir los campos críticos cuya ausencia total dispararía el error en el frontend
+                // Solo la temperatura y al menos una forma de precipitación son críticas para el "error general"
+                let errorCriticoPresente = (
+                    temp === '--' && // Si la temperatura está ausente
+                    actualPrecipDaily === 0 && // Y no hay precipitación de lluvia
+                    actualSnowDepth === 0      // Y no hay precipitación de nieve
                 );
-
-                // EXCEPCIÓN para Villa Catedral (IBARIL29): No considerar viento para el error general
-                if (stationId === "IBARIL29") {
-                    datosPrincipalesFaltan = (
-                        temp === '--' &&
-                        precipDiaria === 0 &&
-                        snowDepth === '0.0'
-                    );
-                }
 
                 return {
                     temp,
                     windSpeed,
                     windGust,
                     windDir,
-                    precipDaily: precipDiaria.toFixed(1),
-                    snowDepth,
+                    precipDaily: actualPrecipDaily.toFixed(1),
+                    snowDepth: actualSnowDepth.toFixed(1),
                     obsTime,
-                    error: datosPrincipalesFaltan
+                    error: errorCriticoPresente // Aquí se usa la nueva lógica
                 };
 
             } catch (error) {
