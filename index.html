@@ -216,11 +216,24 @@
         .wind-rose {
             width: 80px; /* Tamaño de la caja de la brújula */
             height: 80px;
-            margin-bottom: 8px;
-            display: flex; /* Asegura que el círculo se centre dentro de esta caja */
+            margin-bottom: 12px; /* Aumentamos el margen para la 'N' fija */
+            display: flex;
             justify-content: center;
             align-items: center;
             flex-shrink: 0;
+            position: relative; /* Para posicionar la 'N' fija relativa a este */
+        }
+
+        /* Estilo para la 'N' fija encima del círculo */
+        .fixed-north {
+            position: absolute; /* Para posicionarlo relativo al .wind-rose */
+            top: 0; /* Pegado a la parte superior */
+            left: 50%; /* Centrado horizontalmente */
+            transform: translateX(-50%); /* Ajuste para centrar */
+            font-size: 0.7rem; /* Tamaño de la 'N' fija */
+            font-weight: bold;
+            color: #e0e0e0; /* Color de la 'N' fija */
+            z-index: 3; /* Para que esté por encima del círculo y la flecha */
         }
 
         /* Estilos para el círculo exterior de la brújula */
@@ -240,7 +253,7 @@
             height: 0;
             border-left: 6px solid transparent;
             border-right: 6px solid transparent;
-            border-bottom: 12px solid #f0711c; /* Color de la flecha: ROJA/NARANJA */
+            border-bottom: 12px solid #FF0000; /* Color de la flecha: ROJO INTENSO */
             top: 10px; /* Posiciona la punta de la flecha desde arriba */
             left: 50%;
             transform: translateX(-50%); /* Centra horizontalmente la flecha */
@@ -489,6 +502,7 @@
                 <div class="data-column">
                     <div class="wind-container">
                         <div class="wind-rose">
+                            <div class="fixed-north">N</div>
                             <div class="compass-circle">
                                 <div class="compass-arrow" id="wind-arrow-primary"></div>
                                 <div class="direction-north">N</div>
@@ -524,6 +538,7 @@
                 <div class="data-column">
                     <div class="wind-container">
                         <div class="wind-rose">
+                            <div class="fixed-north">N</div>
                             <div class="compass-circle">
                                 <div class="compass-arrow" id="wind-arrow-secondary"></div>
                                 <div class="direction-north">N</div>
@@ -557,6 +572,7 @@
                 <div class="data-column">
                     <div class="wind-container">
                         <div class="wind-rose">
+                            <div class="fixed-north">N</div>
                             <div class="compass-circle">
                                 <div class="compass-arrow" id="wind-arrow-tertiary"></div>
                                 <div class="direction-north">N</div>
@@ -602,17 +618,17 @@
 
         // Configuración de estaciones Wunderground (actualizada)
         const estaciones = {
-    primary: { // ¡Cambia 'primary' a 'primary'!
+    primary: {
        id: "IDEPAR138", // Cerro Otto
         nombre: "Cerro Otto, ppg.",
         elevacion: "1422 m.s.n.m"                        
     },            
-    secondary: { // ¡Cambia 'secondary' a 'secondary'!
+    secondary: {
         id: "IBARIL29", // Villa Catedral
         nombre: "Villa Catedral",
         elevacion: "1070 m.s.n.m"
     },
-    tertiary: { // ¡Cambia 'tertiary' a 'tertiary'!
+    tertiary: {
         id: "IDEPAR37", // Lomas del Cauquén
         nombre: "Lomas del Cauquén",
         elevacion: "932 m.s.n.m"
@@ -839,15 +855,15 @@ async function actualizarDatos() {
 
     // Actualiza cada estación por separado
     await Promise.all([
-        obtenerDatosWunderground(estaciones.primary.id) // Usar estaciones.primary.id
-            .then(datos => actualizarEstacion(datos, 'primary')) // Prefijo 'primary'
-            .catch(error => mostrarError(error.message || "Error al actualizar datos Cerro Otto", 'primary')), // Corrección: mostrarError
-        obtenerDatosWunderground(estaciones.secondary.id) // Usar estaciones.secondary.id
-            .then(datos => actualizarEstacion(datos, 'secondary')) // Prefijo 'secondary'
-            .catch(error => mostrarError(error.message || "Error al actualizar datos Villa Catedral", 'secondary')), // Corrección: mostrarError
-        obtenerDatosWunderground(estaciones.tertiary.id) // Usar estaciones.tertiary.id
-            .then(datos => actualizarEstacion(datos, 'tertiary')) // Prefijo 'tertiary'
-            .catch(error => mostrarError(error.message || "Error al actualizar datos Lomas del Cauquén", 'tertiary')), // Corrección: mostrarError
+        obtenerDatosWunderground(estaciones.primary.id)
+            .then(datos => actualizarEstacion(datos, 'primary'))
+            .catch(error => mostrarError(error.message || "Error al actualizar datos Cerro Otto", 'primary')),
+        obtenerDatosWunderground(estaciones.secondary.id)
+            .then(datos => actualizarEstacion(datos, 'secondary'))
+            .catch(error => mostrarError(error.message || "Error al actualizar datos Villa Catedral", 'secondary')),
+        obtenerDatosWunderground(estaciones.tertiary.id)
+            .then(datos => actualizarEstacion(datos, 'tertiary'))
+            .catch(error => mostrarError(error.message || "Error al actualizar datos Lomas del Cauquén", 'tertiary')),
         cargarPronostico().catch(error => {
             console.error("Error cargando pronóstico:", error);
             document.getElementById('forecast-container').innerHTML = 
