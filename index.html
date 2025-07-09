@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
-    <title>Monitor Meteo Cerros</title>
+    <title>Monitor Meteo Cerros v.15</title>
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
@@ -217,7 +217,7 @@
             margin: 3px 0;
         }
         .station-secondary .wind-rose,
-        .station-terciary .wind-rose {
+        .station-tertiary .wind-rose {
             width: 50px;
             height: 50px;
         }
@@ -609,7 +609,8 @@
 
         // Función para obtener dirección del viento en texto
         function getWindDirection(degrees) {
-            if (degrees === null || degrees === undefined) return '--';
+            // Asegura que degrees es un número antes de usarlo
+            if (degrees === null || typeof degrees !== 'number' || isNaN(degrees)) return '--';
             const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
             const index = Math.round((degrees % 360) / 22.5);
             return directions[index % 16];
@@ -651,7 +652,9 @@
                 const temp = (metric.temp !== undefined && metric.temp !== null) ? metric.temp.toFixed(1) : '--';
                 const windSpeed = (metric.windSpeed !== undefined && metric.windSpeed !== null) ? metric.windSpeed.toFixed(1) : '--';
                 const windGust = (metric.windGust !== undefined && metric.windGust !== null) ? metric.windGust.toFixed(1) : '--';
-                const windDir = (obs.winddir !== undefined && obs.winddir !== null) ? obs.winddir : '--';
+                
+                // windDir debe ser null o un número para la lógica CSS
+                const windDir = (obs.winddir !== undefined && obs.winddir !== null && !isNaN(obs.winddir)) ? obs.winddir : null;
                 
                 // Convertir precipDiaria y snowDepth a números o 0 si no son válidos, para una mejor comprobación.
                 const actualPrecipDaily = (metric.precipTotal24h !== undefined && metric.precipTotal24h !== null) ? metric.precipTotal24h : 
@@ -664,8 +667,8 @@
                 // Solo la temperatura y al menos una forma de precipitación son críticas para el "error general"
                 let errorCriticoPresente = (
                     temp === '--' && // Si la temperatura está ausente
-                    actualPrecipDaily === 0 && // Y no hay precipitación de lluvia
-                    actualSnowDepth === 0      // Y no hay precipitación de nieve
+                    actualPrecipDaily === 0 && // Y no hay precipitación de lluvia (asumimos 0 si es null/undefined)
+                    actualSnowDepth === 0      // Y no hay precipitación de nieve (asumimos 0 if null/undefined)
                 );
 
                 return {
@@ -687,9 +690,9 @@
                     temp: '--',
                     windSpeed: '--',
                     windGust: '--',
-                    windDir: '--',
-                    precipDaily: '--',
-                    snowDepth: '--',
+                    windDir: null, // Se cambia a null para que sea manejado correctamente por actualizarEstacion
+                    precipDaily: null, // Se cambia a null para que sea manejado correctamente por actualizarEstacion
+                    snowDepth: null, // Se cambia a null para que sea manejado correctamente por actualizarEstacion
                     obsTime: '--:--'
                 };
             }
@@ -697,31 +700,43 @@
 
         // Función para actualizar la interfaz
         function actualizarEstacion(datos, prefijo) {
+            // Si hay un error crítico o la API falló por completo
             if (datos.error) {
                 mostrarError(datos.message, prefijo);
             } else {
                 document.getElementById(`error-${prefijo}`).style.display = 'none';
             }
 
+            // Actualizar temperatura, velocidad y ráfagas (maneja '--' por diseño)
             document.getElementById(`temp-${prefijo}`).textContent = `${datos.temp}°C`;
             document.getElementById(`wind-speed-${prefijo}`).textContent = `${datos.windSpeed} km/h (${getWindDirection(datos.windDir)})`;
             document.getElementById(`wind-gust-${prefijo}`).textContent = `Ráfagas: ${datos.windGust} km/h`;
             
             const windArrow = document.getElementById(`wind-arrow-${prefijo}`);
-            if (datos.windDir && datos.windDir !== '--') {
+            // Rotar la flecha solo si windDir es un número válido
+            if (datos.windDir !== null && typeof datos.windDir === 'number' && !isNaN(datos.windDir)) {
                 windArrow.style.transform = `translateX(-50%) rotate(${datos.windDir}deg)`;
+            } else {
+                windArrow.style.transform = `translateX(-50%) rotate(0deg)`; // Valor por defecto o reinicio
             }
 
+            // Mostrar precipitación y nieve, manejando nulls para la visualización
+            const displayPrecipDaily = datos.precipDaily !== null ? `${datos.precipDaily} mm` : '-- mm';
+            const displaySnowDepth = datos.snowDepth !== null ? `${datos.snowDepth} cm` : '-- cm';
+
             document.getElementById(`rain-${prefijo}`).innerHTML = `
-                <div>Lluvias: ${datos.precipDaily} mm</div>
-                <div>Nieve: ${datos.snowDepth} cm</div>
+                <div>Lluvias: ${displayPrecipDaily}</div>
+                <div>Nieve: ${displaySnowDepth}</div>
             `;
 
             // Cambia el color del círculo según la velocidad del viento
             let color = "#ff7b25"; // color por defecto
-            if (datos.windSpeed > 40) color = "#e74c3c"; // rojo si viento fuerte
-            else if (datos.windSpeed > 20) color = "#f1c40f"; // amarillo si viento moderado
-
+            // Asegura que windSpeed sea un número antes de comparar
+            const windSpeedNum = parseFloat(datos.windSpeed);
+            if (!isNaN(windSpeedNum)) { // Solo si es un número válido
+                if (windSpeedNum > 40) color = "#e74c3c"; // rojo si viento fuerte
+                else if (windSpeedNum > 20) color = "#f1c40f"; // amarillo si viento moderado
+            }
             document.querySelector(`.station-${prefijo} .compass-circle`).style.borderColor = color;
 
             document.getElementById('update-time').textContent = datos.obsTime;
@@ -825,7 +840,7 @@
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             actualizarDatos();
-            setInterval(actualizarDatos, 10 * 60 * 1000);
+            setInterval(actualizarDatos, 15 * 60 * 1000);
         });
     </script>
 </body>
